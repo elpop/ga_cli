@@ -58,7 +58,17 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ./qr_to_ga_cli.pl export_accounts_sample.jpg
     ```
     This program generate a file called "ga_cli.conf", is a perl hash definition with the information of your accounts.
+    
+    The file show the account or accounts info:
 
+    ```
+    (
+    'OpenEnchilada' => {
+        keyid => '@El_Pop',
+        secret => "\104\157\156\144\145\040\163\145\040\141\147\165\141\156\164\141\040\166\141\162\141\040\164\145\143\156\157\154\303\263\147\151\143\141" },
+    );
+    ```
+    
 3. Use the Google Authenticator CLI Tool
 
     ```
