@@ -44,7 +44,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
         
     [Google::ProtocolBuffers](https://metacpan.org/pod/Google::ProtocolBuffers)
 
-    All the Perl Moules are available via [metacpan](https://metacpan.org) or install via de "cpan" program in you system. Debian/Ubuntu and Fedora has packages from the perl modules.
+    All the Perl Moules are available via [metacpan](https://metacpan.org) or install via de "cpan" program in you system. Debian/Ubuntu and Fedora has packages for the perl modules.
     
 ## Usage
 
