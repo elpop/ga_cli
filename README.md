@@ -76,7 +76,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
         OpenEnchilada  972144
     ```
     
-    The ga_cli program shows in color green the values you can use. When only left 5 seconds for Code change, shows in colo red de value. The values changes each 30 seconds.
+    The ga_cli program shows in color green the values you can use. When only left 5 seconds for Code change, shows the value in color red. The values changes each 30 seconds.
     
     Is important to make your computer time correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
     
