@@ -76,10 +76,10 @@ if ($ARGV[0] ne '') {
     foreach my $ref (@{$protocol_buffer->{Index}}) {
 
     	# convert the passwords in octal notation
-	$ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
+	    $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
 
-	# Assign values to the key ring
-	if ($ref->{issuer} ne '') {
+	    # Assign values to the key ring
+	    if ($ref->{issuer} ne '') {
             $key_ring{$ref->{issuer}}{secret} = $ref->{pass};
             $key_ring{$ref->{issuer}}{keyid} = $ref->{keyid};
         }
