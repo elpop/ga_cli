@@ -6,9 +6,9 @@ use Imager::QRCode;
 
 if ($ARGV[0] ne '') {
     my $auth = Auth::GoogleAuth->new({
-           secret => 'Passphrase',
-           issuer => 'Company',
-           key_id => 'your@mail.com',
+           secret => 'Another silly passphrase',
+           issuer => 'OpenEnchilada',
+           key_id => '@El_Pop',
        });
     $auth->secret32( encode_base32( $auth->secret() ) );
     if ($ARGV[0] eq '-qr') {
