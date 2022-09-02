@@ -11,7 +11,7 @@
 #-------------------------------------------------------------------#
 # This code are released under the GPL 3.0 License. Any change must #
 # be report to the authors                                          #
-#                 (c) 2021 - Fernando Romo                          #
+#                 (c) 2022 - Fernando Romo                          #
 #===================================================================#
 use strict;
 use Auth::GoogleAuth;
@@ -47,7 +47,7 @@ foreach my $issuer (sort keys %key_ring) {
            key_id => "$key_ring{$issuer}{key_id}",
        });
     $auth->secret32( encode_base32( $auth->secret() ) );
-        printf( "%16s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
+    printf( "%16s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
     $auth->clear();
 }
 

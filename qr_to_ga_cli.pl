@@ -13,7 +13,7 @@
 #-------------------------------------------------------------------#
 # This code are released under the GPL 3.0 License. Any change must #
 # be report to the authors                                          #
-#                 (c) 2021 - Fernando Romo                          #
+#                 (c) 2022 - Fernando Romo                          #
 #===================================================================#
 use strict;
 use Image::Magick;
@@ -30,7 +30,7 @@ Google::ProtocolBuffers->parse("
                 optional string keyid = 2;
                 optional string issuer = 3;
          }
-	 repeated Keys Index = 1;
+     repeated Keys Index = 1;
      }
      ",
      {create_accessors => 1}
@@ -75,11 +75,11 @@ if ($ARGV[0] ne '') {
     my $protocol_buffer = OTP->decode("$mime_data");
     foreach my $ref (@{$protocol_buffer->{Index}}) {
 
-    	# convert the passwords in octal notation
-	    $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
+        # convert the passwords in octal notation
+        $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
 
-	    # Assign values to the key ring
-	    if ($ref->{issuer} ne '') {
+        # Assign values to the key ring
+        if ($ref->{issuer} ne '') {
             $key_ring{$ref->{issuer}}{secret} = $ref->{pass};
             $key_ring{$ref->{issuer}}{keyid} = $ref->{keyid};
         }
