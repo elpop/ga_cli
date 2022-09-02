@@ -79,7 +79,52 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     The ga_cli program shows in color green the values you can use. When only left 5 seconds for Code change, shows the value in color red. The values changes each 30 seconds.
     
     Is important to keep your computer time correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
+
+4. The two_factor.pl program
+
+    Is a custom example of use code, validate and extract general info of a given account.
     
+    The options are:
+    
+    ```
+    ./two_factor.pl 
+    Usage:
+      
+          1) for Gogle authenticator verification:
+      
+             ./two_factor.pl [Code]
+      
+          2) To generate qr code for suscribe on Google Authenticator app:
+      
+             ./two_factor.pl -qr
+      
+             The file is named 'two_factor.jpg'
+      
+          3) print all info (passphrase, base32, issuer and key_id):
+      
+             ./two_factor.pl -info
+      
+          4) print One Time Password like the Google Authenticator app:
+      
+             ./two_factor.pl -code
+    ```
+    You can configure your account data in the body of the program:
+    
+    ```
+    # Define credentials used by Auth::GoogleAuth  
+    my $auth = Auth::GoogleAuth->new({
+           secret => 'Another silly passphrase',
+           issuer => 'OpenEnchilada',
+           key_id => '@El_Pop',
+       });
+    ```
+    
+    Only change the secret, issuer and key_id according a your preferences.
+    
+    When use the "-qr" option, you see a QR like the following to add account into the Google Authenticator App:
+    
+    ![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
+
 ## Author
 
    Fernando Romo (pop@cofradia.org)
