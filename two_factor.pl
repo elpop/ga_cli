@@ -23,12 +23,16 @@ sub semaphore {
 }
 
 if ($ARGV[0] ne '') {
+    # Define credentials used by Auth::GoogleAuth  
     my $auth = Auth::GoogleAuth->new({
            secret => 'Another silly passphrase',
            issuer => 'OpenEnchilada',
            key_id => '@El_Pop',
        });
+    # use Base32, in case you want to store the passphrase, take this value.
     $auth->secret32( encode_base32( $auth->secret() ) );
+
+    # Generate de QR image to add the account defined above in the Google Authenticator App
     if ($ARGV[0] eq '-qr') {
         my $qrcode = Imager::QRCode->new(
                size          => 4,
@@ -45,15 +49,18 @@ if ($ARGV[0] ne '') {
         my $img = $qrcode->plot("$leyend");
         $img->write(file => "two_factor.jpg");
     }
+    # Show the credentials Detail
     elsif ($ARGV[0] eq '-info') {
         print 'Passphrase: ' . $auth->secret() . "\n";
         print '   base 32: ' . $auth->secret32() . "\n";
         print '    Issuer: ' . $auth->issuer() . "\n";
         print '    Key_id: ' . $auth->key_id() . "\n";
     }
+    # Generate a code like de App
     elsif ($ARGV[0] eq '-code') {
         printf( "%16s " . semaphore() . " %06d" . RESET ."\n", $auth->issuer(), $auth->code() );
     }
+    # if not given option, wait for a code to check if is valid
     else {
         if ($auth->verify("$ARGV[0]")) {    
             print "Valid\n";
@@ -62,8 +69,10 @@ if ($ARGV[0] ne '') {
             print "Invalid\n";
         }
     }
+    # Clean up
     $auth->clear();
 }
+# If not has a parameter, show the help
 else {
     print "Usage:\n\n";
     print "    1) for Gogle authenticator verification:\n\n";
