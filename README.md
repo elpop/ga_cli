@@ -75,7 +75,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ./ga_cli.pl 
         OpenEnchilada  972144
     ```
-    Is important your computer time has correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
+    Is important to make your computer time correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
     
 ## Author
 
