@@ -4,6 +4,24 @@ use Auth::GoogleAuth;
 use Convert::Base32;
 use Imager::QRCode;
 
+# Text Colors
+use constant {
+    RESET    => "\033[0m",
+    FG_RED   => "\033[31m",
+    FG_GREEN => "\033[32m",
+};
+
+# Show Green or Red Text if the timer change
+sub semaphore {
+    my ($seconds) = (localtime( time() ))[0];
+    my $aux = $seconds % 30;
+    my $color = FG_RED;
+    if ($aux <= 25) {
+       $color = FG_GREEN;
+    }
+    return $color;
+}
+
 if ($ARGV[0] ne '') {
     my $auth = Auth::GoogleAuth->new({
            secret => 'Another silly passphrase',
@@ -34,7 +52,7 @@ if ($ARGV[0] ne '') {
         print '    Key_id: ' . $auth->key_id() . "\n";
     }
     elsif ($ARGV[0] eq '-code') {
-        print 'OTP: ' . $auth->code() . "\n";
+        printf( "%16s " . semaphore() . " %06d" . RESET ."\n", $auth->issuer(), $auth->code() );
     }
     else {
         if ($auth->verify("$ARGV[0]")) {    
