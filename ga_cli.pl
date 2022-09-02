@@ -16,7 +16,6 @@
 use strict;
 use Auth::GoogleAuth;
 use Convert::Base32;
-use Imager::QRCode;
 
 # Text Colors
 use constant {
