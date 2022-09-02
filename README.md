@@ -82,7 +82,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
 
 4. The two_factor.pl program
 
-    Is a custom example of use code, validate and extract general info of a given account.
+    Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
     The options are:
     
@@ -119,9 +119,9 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
        });
     ```
     
-    Only change the secret, issuer and key_id according a your preferences.
+    Only change the secret, issuer and key_id according your preferences.
     
-    When use the "-qr" option, you see a QR like the following to add account into the Google Authenticator App:
+    When use the "-qr" option, you see a QR image like the following to add account into the Google Authenticator App:
     
     ![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
 
