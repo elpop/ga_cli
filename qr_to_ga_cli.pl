@@ -60,7 +60,6 @@ if ($ARGV[0] ne '') {
 
     # Read QR Data
     foreach my $symbol ($image->get_symbols()) {
-        # do something useful with results
         ($data) = $symbol->get_data() =~/data=(.*)/;
     }
     undef($image);
@@ -100,7 +99,7 @@ if ($ARGV[0] ne '') {
     print CONF ");\n";
     close(CONF);
 }
-# If you don't give any file print help
+# If you don't give any file, print help
 else {
     print "Usage:\n";
     print "    ./qr_to_ga_cli.pl \[image_file(.png|.jpg)\]\n";
