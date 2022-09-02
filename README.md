@@ -48,7 +48,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     
 ## Usage
 
-1. First with use th Google Authenticator App and use The "Export accounts" option, follow the guide and select one or all your accounts, The App has an option to delete the exported acoounts, DON'T DELETE YOUR INFO, we use the QR generated like this example:
+1. First with use th Google Authenticator App and use The "Export accounts" option, follow the guide and select one or all your accounts, The App has an option to delete the exported accounts, DON'T DELETE YOUR INFO, we use the QR generated like this example:
 
 ![](https://github.com/elpop/2fa/blob/main/export_accounts_sample.jpg?raw=true)
 
@@ -65,6 +65,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ./ga_cli.pl 
         OpenEnchilada  972144
     ```
+    Is important your computer time has correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
     
 ## Author
 
