@@ -26,7 +26,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     
     [Librencode](https://github.com/fukuchi/libqrencode) for QR generation.
     
-    Is important install this libraries before the perl modules. Debian/Ubuntu and Fedora has packages for all the libraries and utilities.
+    Is important to install all the libraries before the perl modules. Debian/Ubuntu and Fedora has packages for all the libraries and utilities.
 
 3. Perl Dependencies
     
