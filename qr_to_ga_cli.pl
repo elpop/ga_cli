@@ -27,7 +27,7 @@ Google::ProtocolBuffers->parse("
      message OTP {
          message Keys {
                 optional string pass   = 1;
-                optional string keyid = 2;
+                optional string keyid  = 2;
                 optional string issuer = 3;
          }
      repeated Keys Index = 1;
@@ -43,6 +43,7 @@ my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command
 
 # Process if exists the argument with a image filename 
 if ($#images >=0) {
+    # Process images
     foreach my $image (@images) {
         # Prepare to Read the QR using ZBar libs
         my $scanner = Barcode::ZBar::ImageScanner->new();
@@ -82,11 +83,11 @@ if ($#images >=0) {
             # Assign values to the key ring
             if ($ref->{issuer} ne '') {
                 $key_ring{$ref->{issuer}}{secret} = $ref->{pass};
-                $key_ring{$ref->{issuer}}{keyid} = $ref->{keyid};
+                $key_ring{$ref->{issuer}}{keyid}  = $ref->{keyid};
             }
             else {
                 $key_ring{$ref->{keyid}}{secret} = $ref->{pass};
-                $key_ring{$ref->{keyid}}{keyid} = $ref->{keyid};
+                $key_ring{$ref->{keyid}}{keyid}  = $ref->{keyid};
             }
         }
     }
@@ -97,7 +98,7 @@ if ($#images >=0) {
     foreach my $issuer (sort keys %key_ring) {
         print CONF "    '$issuer' => {\n";
         print CONF "        keyid => '$key_ring{$issuer}{keyid}',\n";
-        print CONF"        secret => \"$key_ring{$issuer}{secret}\" },\n";
+        print CONF "        secret => \"$key_ring{$issuer}{secret}\" },\n";
     }
     print CONF ");\n";
     close(CONF);
