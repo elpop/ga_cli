@@ -28,6 +28,12 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     
     Is important to install all the libraries before the perl modules. Debian/Ubuntu and Fedora has packages for all the libraries and utilities.
 
+    for Debian/Ubuntu Linux systems:
+    
+    ```
+    sudo apt-get install zbar-tools imagemagick protobuf-compiler libqrencode-dev
+    ```
+    
 3. Perl Dependencies
     
     [Convert::Base32](https://metacpan.org/pod/Convert::Base32)
@@ -45,6 +51,14 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     [Google::ProtocolBuffers](https://metacpan.org/pod/Google::ProtocolBuffers)
 
     All the Perl Moules are available via [metacpan](https://metacpan.org) or install via "cpan" program in your system. Debian/Ubuntu and Fedora has packages for the perl modules.
+    
+    for Debian/Ubuntu Linux systems:
+    
+    ```
+    sudo apt-get install libimage-magick-perl libconvert-base32-perl libimager-qrcode-perl libbarcode-zbar-perl libauth-googleauth-perl libgoogle-protocolbuffers-perl
+    ```
+    
+    Mime::Base64 is available in the Perl core instalation.
     
 ## Usage
 
