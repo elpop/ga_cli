@@ -125,6 +125,11 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     
     ![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
 
+## To-Do
+
+   - Multi Image processing.
+   - ga_cli to QR for bulk loads on Google Authenticator.
+
 ## Author
 
    Fernando Romo (pop@cofradia.org)
