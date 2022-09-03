@@ -57,7 +57,14 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ```   
     ./qr_to_ga_cli.pl export_accounts_sample.jpg
     ```
-    This program generate a file called "ga_cli.conf", is a perl hash definition with the information of your accounts.
+    
+    This program generate a file called "ga_cli.conf", is a perl hash definition with the information of your accounts. JPG and PNG formats are supported.
+    
+    You can process multiple images when Google Authenticator make more than one QR:
+
+    ```   
+    ./qr_to_ga_cli.pl qr_one.jpg qr_two.jpg ...
+    ```
     
     The file show the account or accounts info:
 
