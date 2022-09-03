@@ -39,55 +39,58 @@ Google::ProtocolBuffers->parse("
 # Work variables
 my $data = '';
 my %key_ring = ();
+my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command arguments 
 
 # Process if exists the argument with a image filename 
-if ($ARGV[0] ne '') {
-    # Prepare to Read the QR using ZBar libs
-    my $scanner = Barcode::ZBar::ImageScanner->new();
-    $scanner->parse_config("enable");
-
-    # Use ImageMagick to obtain image properties
-    my $magick = Image::Magick->new();
-    $magick->Read($ARGV[0]) && die;
-    my $raw = $magick->ImageToBlob(magick => 'GRAY', depth => 8);
-
-    # Set Zbar reader and read image
-    my $image = Barcode::ZBar::Image->new();
-    $image->set_format('Y800');
-    $image->set_size($magick->Get(qw(columns rows)));
-    $image->set_data($raw);
-    my $n = $scanner->scan_image($image);
-
-    # Read QR Data
-    foreach my $symbol ($image->get_symbols()) {
-        ($data) = $symbol->get_data() =~/data=(.*)/;
-    }
-    undef($image);
-
-    # URL Encode
-    $data =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
-
-    # Decode Base64 Info
-    my $mime_data = decode_base64($data);
-
-    # Process Protocol Buffers from de MIME Base64 Data
-    my $protocol_buffer = OTP->decode("$mime_data");
-    foreach my $ref (@{$protocol_buffer->{Index}}) {
-
-        # convert the passwords in octal notation
-        $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
-
-        # Assign values to the key ring
-        if ($ref->{issuer} ne '') {
-            $key_ring{$ref->{issuer}}{secret} = $ref->{pass};
-            $key_ring{$ref->{issuer}}{keyid} = $ref->{keyid};
+if ($#images >=0) {
+    foreach my $image (@images) {
+        # Prepare to Read the QR using ZBar libs
+        my $scanner = Barcode::ZBar::ImageScanner->new();
+        $scanner->parse_config("enable");
+    
+        # Use ImageMagick to obtain image properties
+        my $magick = Image::Magick->new();
+        $magick->Read($image) && die;
+        my $raw = $magick->ImageToBlob(magick => 'GRAY', depth => 8);
+    
+        # Set Zbar reader and read image
+        my $image = Barcode::ZBar::Image->new();
+        $image->set_format('Y800');
+        $image->set_size($magick->Get(qw(columns rows)));
+        $image->set_data($raw);
+        my $n = $scanner->scan_image($image);
+    
+        # Read QR Data
+        foreach my $symbol ($image->get_symbols()) {
+            ($data) = $symbol->get_data() =~/data=(.*)/;
         }
-        else {
-            $key_ring{$ref->{keyid}}{secret} = $ref->{pass};
-            $key_ring{$ref->{keyid}}{keyid} = $ref->{keyid};
+        undef($image);
+    
+        # URL Encode
+        $data =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
+    
+        # Decode Base64 Info
+        my $mime_data = decode_base64($data);
+    
+        # Process Protocol Buffers from de MIME Base64 Data
+        my $protocol_buffer = OTP->decode("$mime_data");
+        foreach my $ref (@{$protocol_buffer->{Index}}) {
+    
+            # convert the passwords in octal notation
+            $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
+    
+            # Assign values to the key ring
+            if ($ref->{issuer} ne '') {
+                $key_ring{$ref->{issuer}}{secret} = $ref->{pass};
+                $key_ring{$ref->{issuer}}{keyid} = $ref->{keyid};
+            }
+            else {
+                $key_ring{$ref->{keyid}}{secret} = $ref->{pass};
+                $key_ring{$ref->{keyid}}{keyid} = $ref->{keyid};
+            }
         }
     }
-
+ 
     # Create and write a conf file called "ga_cli.conf"
     open(CONF, ">:encoding(UTF-8)","ga_cli.conf") or die "Can't create conf file: $!";
     print CONF "(\n";
