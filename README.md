@@ -127,7 +127,6 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
 
 ## To-Do
 
-   - Multi Image processing.
    - ga_cli to QR for bulk loads on Google Authenticator.
 
 ## Author
