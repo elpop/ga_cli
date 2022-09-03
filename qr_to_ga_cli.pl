@@ -95,7 +95,7 @@ if ($#images >=0) {
     # Create and write a conf file called "ga_cli.conf"
     open(CONF, ">:encoding(UTF-8)","ga_cli.conf") or die "Can't create conf file: $!";
     print CONF "(\n";
-    foreach my $issuer (sort keys %key_ring) {
+    foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
         print CONF "    '$issuer' => {\n";
         print CONF "        keyid => '$key_ring{$issuer}{keyid}',\n";
         print CONF "        secret => \"$key_ring{$issuer}{secret}\" },\n";

@@ -39,14 +39,14 @@ sub semaphore {
 }
 
 # Show the OTP generated
-foreach my $issuer (sort keys %key_ring) {
+foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
     my $auth = Auth::GoogleAuth->new({
            secret => "$key_ring{$issuer}{secret}",
            issuer => "$issuer",
            key_id => "$key_ring{$issuer}{key_id}",
        });
     $auth->secret32( encode_base32( $auth->secret() ) );
-    printf( "%16s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
+    printf( "%30s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
     $auth->clear();
 }
 
