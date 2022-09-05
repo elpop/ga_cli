@@ -92,6 +92,18 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     );
     ```
     
+    You need to move the generated file to your /etc directory:
+    
+    ```
+    sudo mv ga_cli.conf /etc/.
+    ```
+    
+    And if you want, you can move or copy the ga_cli.pl program somewhere in your search path:
+    
+    ```
+    cp ga_cli.pl /usr/local/bin/.
+    ```
+    
 3. Use the Google Authenticator CLI Tool
 
     ```
@@ -100,6 +112,15 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ```
     
     The ga_cli program shows in color green the values you can use. When only left 5 seconds for Code change, shows the value in color red. The values changes each 30 seconds.
+    
+    If you pass a parameter, the cli tool only shows the ones than contain your criteria (case insensitive):
+    
+    ```
+    ./ga_cli.pl bit
+                       BITMAIN  067333
+                        BitMEX  376455
+                         Bitso  215278
+    ```
     
     Is important to keep your computer time correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
 
