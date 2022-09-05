@@ -31,7 +31,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     for Debian/Ubuntu Linux systems:
     
     ```
-    sudo apt-get install zbar-tools imagemagick protobuf-compiler libqrencode-dev
+    sudo apt-get install zbar-dev imagemagick protobuf-compiler libqrencode-dev
     ```
     
     Fedora/Red-Hat Linux systems:
