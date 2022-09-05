@@ -34,6 +34,12 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     sudo apt-get install zbar-tools imagemagick protobuf-compiler libqrencode-dev
     ```
     
+    Fedora/Red-Hat Linux systems:
+    
+    ```
+    sudo dnf install ImageMagick zbar-devel protobuf qrencode-libs
+    ```
+    
 3. Perl Dependencies
     
     [Convert::Base32](https://metacpan.org/pod/Convert::Base32)
@@ -59,6 +65,13 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ```
     
     Mime::Base64 is available in the Perl core instalation.
+    
+    Fedora/Red-Hat Linux systems:
+    
+    ```
+    sudo dnf install perl-Convert-Base32 perl-MIME-Base64 ImageMagick-perl 
+    sudo cpan install Imager::QRCode Barcode::ZBar Auth::GoogleAuth Google::ProtocolBuffers
+    ```
     
 ## Usage
 
