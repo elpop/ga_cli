@@ -25,7 +25,7 @@ use constant {
 };
 
 # Load config File
-my %key_ring = do './ga_cli.conf';
+my %key_ring = do '/etc/ga_cli.conf';
 
 # Show Green or Red Text if the timer change
 sub semaphore {
@@ -46,7 +46,15 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
            key_id => "$key_ring{$issuer}{key_id}",
        });
     $auth->secret32( encode_base32( $auth->secret() ) );
-    printf( "%30s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
+    my $out = sprintf( "%30s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
+    if ($ARGV[0] ne '' ) {
+        if ($issuer =~ /$ARGV[0]/i) {
+           print $out;
+        }
+    }
+    else {
+        print $out;
+    }
     $auth->clear();
 }
 
