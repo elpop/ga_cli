@@ -3,13 +3,10 @@
 # Program => ga_cli_to_qr.pl (In Perl 5.0)            version 0.0.1 #
 #===================================================================#
 # Autor         => Fernando "El Pop" Romo        (pop@cofradia.org) #
-# Creation date => 01/September/2022                                #
+# Creation date => 06/September/2022                                #
 #-------------------------------------------------------------------#
-# Info => This program convert a snapshot of the Export accounts of #
-#         the Google Authenticator App, Read de QR Code, Decode the #
-#         Mime Base64 data, process with protoc (Google Protocol    #
-#         Buffers Compiler) and make a conf file to use the program #
-#         ga_cli.pl                                                 #
+# Info => This program Read the /etc/ga_cli.conf file and generate  #
+#         QR images for Bulk load into the Google Authenticator App.#
 #-------------------------------------------------------------------#
 # This code are released under the GPL 3.0 License. Any change must #
 # be report to the authors                                          #

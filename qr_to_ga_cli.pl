@@ -6,7 +6,7 @@
 # Creation date => 01/September/2022                                #
 #-------------------------------------------------------------------#
 # Info => This program convert a snapshot of the Export accounts of #
-#         the Google Authenticator App, Read de QR Code, Decode the #
+#         the Google Authenticator App, Read the QR Code, Decode    #
 #         Mime Base64 data, process with protoc (Google Protocol    #
 #         Buffers Compiler) and make a conf file to use the program #
 #         ga_cli.pl                                                 #
