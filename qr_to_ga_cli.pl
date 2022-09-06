@@ -67,7 +67,7 @@ if ($#images >=0) {
         }
         undef($image);
     
-        # URL Encode
+        # URL Decode
         $data =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
     
         # Decode Base64 Info
