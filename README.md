@@ -145,7 +145,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ./ga_cli_to_qr.pl
     ```
     
-    The program take all the keys defined on the ga_cli.conf file and create a set of files (dependeing of the keys quantity) named "bulk_keys_XX.jpg" where XX is the sequence.
+    The program take all the keys defined on the "ga_cli.conf" file and create a set of files (depending of the keys quantity) named "bulk_keys_XX.jpg" where XX is the sequence. each image contain 10 keys per image. For example, if you have 25 keys, we generate 3 QR files.
     
 5. The two_factor.pl program
 
