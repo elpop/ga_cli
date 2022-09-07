@@ -39,15 +39,24 @@ Google::ProtocolBuffers->parse("
 
 # Work variables
 my %key_ring = do '/etc/ga_cli.conf';
-my %bulk_ring = ();
+
+my %bulk_ring = ( 'start'   => 1,
+                  'end'     => 1,
+                  'current' => 0, );
 my $ga_qr = 'otpauth-migration://offline?data=';    
 
-# Load Protocol Buffer Array to process
-$bulk_ring{'start'}   = 1;
-$bulk_ring{'end'}     = 1;
-$bulk_ring{'current'} = 0;
+my $count = scalar(keys(%key_ring));
+my $images_count = int($count / 10);
+if ( ($count % 10) > 0) {
+    $images_count++;
+}
+$bulk_ring{end} = $images_count;
+my $seq = 0;
+my $current = 1;
 
+# Load Protocol Buffer Array to process
 foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
+    $seq++;
     push @{$bulk_ring{'Index'}},
          ({
           'issuer' => "$issuer",
@@ -57,26 +66,28 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
           'two'    => 1,
           'three'  => 2,
          });
+    if ( ( ($seq % 10) == 0 )
+        || ($seq == $count) ) {
+        # Process Protocol Buffers from de MIME Base64 Data
+        my $protocol_buffer = GA->encode(\%bulk_ring);
+        # Encode MIME Base64                
+        my $mime_data = encode_base64($protocol_buffer);
+        # URL Encode
+        $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
+         # generate QR image
+         my $qrcode = Imager::QRCode->new(
+                size          => 4,
+                margin        => 1,
+                version       => 1,
+                level         => 'M',
+                casesensitive => 1,
+                lightcolor    => Imager::Color->new(255, 255, 255),
+                darkcolor     => Imager::Color->new(0, 0, 0),
+         );
+         my $img = $qrcode->plot("$ga_qr$mime_data");
+         my $qr_file = 'bulk_keys_' . sprintf("%02d",$current) . '.jpg';
+         $img->write(file => "$qr_file");
+         $bulk_ring{'Index'} = ();
+         $bulk_ring{current} = $current++;
+    }
 }
-
-# Process Protocol Buffers from de MIME Base64 Data
-my $protocol_buffer = GA->encode(\%bulk_ring);
-
-# Encode MIME Base64                
-my $mime_data = encode_base64($protocol_buffer);
-
-# URL Encode
-$mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-
-# generate QR image
-my $qrcode = Imager::QRCode->new(
-       size          => 4,
-       margin        => 1,
-       version       => 1,
-       level         => 'M',
-       casesensitive => 1,
-       lightcolor    => Imager::Color->new(255, 255, 255),
-       darkcolor     => Imager::Color->new(0, 0, 0),
-   );
-my $img = $qrcode->plot("$ga_qr$mime_data");
-$img->write(file => "bulk_keys.jpg");
