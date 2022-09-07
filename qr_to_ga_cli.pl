@@ -77,7 +77,7 @@ if ($#images >=0) {
     
         # Decode Base64 Info
         my $mime_data = decode_base64($data);
-        
+      
         # Process Protocol Buffers from de MIME Base64 Data
         my $protocol_buffer = GA->decode("$mime_data");
         foreach my $ref (@{$protocol_buffer->{Index}}) {
