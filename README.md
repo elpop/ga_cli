@@ -101,9 +101,13 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     cat $HOME/.ga_cli/keys
     
     (
-    'OpenEnchilada' => {
-        keyid => '@El_Pop',
-        secret => "\104\157\156\144\145\040\163\145\040\141\147\165\141\156\164\141\040\166\141\162\141\040\164\145\143\156\157\154\303\263\147\151\143\141" },
+        'OpenEnchilada' => {
+            keyid     => '@El_Pop',
+            secret    => "\104\157\156\144\145\040\163\145\040\141\147\165\141\156\164\141\040\166\141\162\141\040\164\145\143\156\157\154\303\263\147\151\143\141",
+            algorithm => 1,
+            digits    => 1,
+            type      => 2,
+        },
     );
     ```
     
