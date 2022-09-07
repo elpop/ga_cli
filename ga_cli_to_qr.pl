@@ -85,7 +85,7 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
                 darkcolor     => Imager::Color->new(0, 0, 0),
          );
          my $img = $qrcode->plot("$ga_qr$mime_data");
-         my $qr_file = 'bulk_keys_' . sprintf("%02d",$current) . '.jpg';
+         my $qr_file = 'bulk_keys_' . sprintf("%02d",$current) . '_of_' . sprintf("%02d", $images_count) . '.jpg';
          $img->write(file => "$qr_file");
          $bulk_ring{'Index'} = ();
          $bulk_ring{current} = $current++;
