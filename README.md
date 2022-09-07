@@ -137,7 +137,17 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     
     Is important to keep your computer time correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
 
-4. The two_factor.pl program
+4. Return all your Keys to the Google Authenticator App
+
+    You can generate a full backup of your keys generating Multiple QR images to use with the Google Authenticator App:
+    
+    ```
+    ./ga_cli_to_qr.pl
+    ```
+    
+    The program take all the keys defined on the ga_cli.conf file and create a set of files (dependeing of the keys quantity) named "bulk_keys_XX.jpg" where XX is the sequence.
+    
+5. The two_factor.pl program
 
     Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
@@ -184,7 +194,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
 
 ## To-Do
 
-   - Multi QR image generation on ga_cli_to_qr.pl for bulk loads on Google Authenticator.
+   - Multi User support 
 
 ## Author
 
