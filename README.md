@@ -93,11 +93,13 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ./qr_to_ga_cli.pl qr_one.jpg qr_two.jpg ...
     ```
     
-    This program generate a file called "ga_cli.conf", is a perl hash definition with the information of your accounts.
+    This program generate a file called "keys" on the path "$HOME/.,ga_cli", is a perl hash definition with the information of your accounts.
     
     The file show the account or accounts info:
 
     ```
+    cat $HOME/.ga_cli/keys
+    
     (
     'OpenEnchilada' => {
         keyid => '@El_Pop',
@@ -105,13 +107,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     );
     ```
     
-    You need to move the generated file to your /etc directory:
-    
-    ```
-    sudo mv ga_cli.conf /etc/.
-    ```
-    
-    And if you want, you can move or copy the ga_cli.pl program somewhere in your search path:
+    If you want, you can move or copy the ga_cli.pl program somewhere in your search path:
     
     ```
     cp ga_cli.pl /usr/local/bin/.
@@ -145,7 +141,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ./ga_cli_to_qr.pl
     ```
     
-    The program take all the keys defined on the "ga_cli.conf" file and create a set of files (depending of the keys quantity) named "bulk_keys_YY_of_XX.jpg" where YY is the sequence and XX the total images on the set.
+    The program take all the keys defined on the "$HOME/./ga_cli/keys" file and create a set of files (depending of the keys quantity) named "bulk_keys_YY_of_XX.jpg" where YY is the sequence and XX the total images on the set.
     
     Each QR contain 10 keys per image. For example, if you have 25 keys, we generate 3 QR files:
     

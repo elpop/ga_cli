@@ -52,8 +52,8 @@ unless (-f $work_dir) {
     mkdir($work_dir);
 }
 # make a backup (just in case).
-if (-f "$work_dir\/ga_cli.conf") {
-    move("$work_dir\/ga_cli.conf", "$work_dir\/ga_cli.conf.back");
+if (-f "$work_dir\/keys") {
+    move("$work_dir\/keys", "$work_dir\/keys.back");
 }
 
 # Process if exists the argument with a image filename 
@@ -108,7 +108,7 @@ if ($#images >=0) {
     }
  
     # Create and write a conf file called "ga_cli.conf"
-    open(CONF, ">:encoding(UTF-8)","$work_dir\/ga_cli.conf") or die "Can't create conf file: $!";
+    open(CONF, ">:encoding(UTF-8)","$work_dir\/keys") or die "Can't create conf file: $!";
     print CONF "(\n";
     foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
         print CONF "    '$issuer' => {\n";

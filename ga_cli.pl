@@ -27,7 +27,7 @@ use constant {
 my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
 
 # Load config File
-my %key_ring = do "$work_dir\/ga_cli.conf";
+my %key_ring = do "$work_dir\/keys";
 
 # Show Green or Red Text if the timer change
 sub semaphore {
