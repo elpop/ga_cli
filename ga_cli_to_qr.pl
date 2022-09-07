@@ -98,11 +98,7 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
         my $mime_data = encode_base64($protocol_buffer);
 
         # URL Encode
-        $mime_data =~ s/\+/%2B/ig;
-        $mime_data =~ s/\//%2F/ig;
-        $mime_data =~ s/=/%3D/ig;
-        #        $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-        print "$mime_data\n";
+        #$mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
 
          # generate QR image
          my $qrcode = Imager::QRCode->new(
