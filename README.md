@@ -135,6 +135,8 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
 
 4. Return all your Keys to the Google Authenticator App
 
+    **** EXPERIMENTAL **** Use under your own risk
+    
     You can generate a full backup of your keys generating Multiple QR images to use with the Google Authenticator App:
     
     ```
