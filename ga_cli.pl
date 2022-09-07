@@ -24,8 +24,10 @@ use constant {
     FG_GREEN => "\033[32m",
 };
 
+my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
+
 # Load config File
-my %key_ring = do '/etc/ga_cli.conf';
+my %key_ring = do "$work_dir\/ga_cli.conf";
 
 # Show Green or Red Text if the timer change
 sub semaphore {

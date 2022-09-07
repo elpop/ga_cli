@@ -38,7 +38,10 @@ Google::ProtocolBuffers->parse("
 );
 
 # Work variables
-my %key_ring = do '/etc/ga_cli.conf';
+my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
+
+# Load config File
+my %key_ring = do "$work_dir\/ga_cli.conf";
 
 my %bulk_ring = ( 'start'   => 1,
                   'end'     => 1,
