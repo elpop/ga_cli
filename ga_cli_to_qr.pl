@@ -30,7 +30,6 @@ Google::ProtocolBuffers->parse("
             optional Algorithm algorithm = 4;
             optional DigitSize digits    = 5;
             optional OtpType   type      = 6;
-            optional int64     counter   = 7;
             enum Algorithm  {
                 ALGO_UNSPECIFIED = 0;
                 SHA1             = 1;
@@ -52,21 +51,19 @@ Google::ProtocolBuffers->parse("
          optional int32 version = 2;
          optional int32 QRCount = 3;
          optional int32 QRIndex = 4;
-         optional int32 batch   = 5;
      }",
      {create_accessors => 1}
 );
 
-# Work variables
-my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
-
 # Load config File
+my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # keys directory
 my %key_ring = do "$work_dir\/keys";
 
+# Work variables
 my %export_ring = ( 'version' => 1,
-                  'QRCount' => 1,
-                  'QRIndex' => 0, );
-my $ga_qr = 'otpauth-migration://offline?data=';    
+                    'QRCount' => 1,
+                    'QRIndex' => 0, );
+my $ga_qr = 'otpauth-migration://offline?data='; # GA export accounts header on QR
 
 # Date
 my ($year, $month, $day) = (localtime( time() ))[5,4,3];
@@ -74,12 +71,14 @@ $year = $year + 1900;
 $month += 1;
 my $date = sprintf("%04d%02d%02d",$year,$month,$day);
 
+# Obtain keys to process
 my $count = scalar(keys(%key_ring));
 my $images_count = int($count / 10);
 if ( ($count % 10) > 0) {
     $images_count++;
 }
 $export_ring{QRCount} = $images_count;
+
 my $seq = 0;
 my $current = 1;
 
@@ -97,6 +96,7 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
          });
     if ( ( ($seq % 10) == 0 )
         || ($seq == $count) ) {
+        
         # Process Protocol Buffers from de MIME Base64 Data
         my $protocol_buffer = GA->encode(\%export_ring);
 
@@ -105,7 +105,7 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
         
         # URL Encode
         $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-        $mime_data =~ s/\%0A//g;
+        $mime_data =~ s/\%0A//g; # avoid new line
         
         # generate QR image
         my $qrcode = Imager::QRCode->new(
