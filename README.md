@@ -138,8 +138,6 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     Is important to keep your computer time correct. The TOTP (Time-Based One Time Password) algorithm used in Google Authenticator need a correct time-date. use a NTP (Network Time Protocol) service to do it.
 
 4. Return all your Keys to the Google Authenticator App
-
-    **** EXPERIMENTAL **** Use under your own risk
     
     You can generate a full backup of your keys generating Multiple QR images to use with the Google Authenticator App:
     
@@ -201,10 +199,6 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     When use the "-qr" option, you see a QR image like the following to add account into the Google Authenticator App:
     
     ![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
-
-## To-Do
-
-   - Multi User support 
 
 ## Author
 
