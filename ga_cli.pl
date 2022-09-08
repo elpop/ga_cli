@@ -26,8 +26,12 @@ use constant {
 
 my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
 
+my %key_ring = ();
+
 # Load config File
-my %key_ring = do "$work_dir\/keys";
+if (-f "$work_dir\/keys") {
+    %key_ring = do "$work_dir\/keys";
+}
 
 # Show Green or Red Text if the timer change
 sub semaphore {
@@ -40,23 +44,31 @@ sub semaphore {
     return $color;
 }
 
-# Show the OTP generated
-foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
-    my $auth = Auth::GoogleAuth->new({
-           secret => "$key_ring{$issuer}{secret}",
-           issuer => "$issuer",
-           key_id => "$key_ring{$issuer}{key_id}",
-       });
-    $auth->secret32( encode_base32( $auth->secret() ) );
-    my $out = sprintf( "%30s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
-    if ($ARGV[0] ne '' ) {
-        if ($issuer =~ /$ARGV[0]/i) {
-           print $out;
-        }
-    }
-    else {
-        print $out;
-    }
-    $auth->clear();
-}
+# if have valid keys, process
+if ( scalar(keys %key_ring) > 0 ) {
 
+    # Generate OTP
+    foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
+        my $auth = Auth::GoogleAuth->new({
+               secret => "$key_ring{$issuer}{secret}",
+               issuer => "$issuer",
+               key_id => "$key_ring{$issuer}{key_id}",
+           });
+        $auth->secret32( encode_base32( $auth->secret() ) );
+        my $out = sprintf( "%30s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
+        
+        # Filter output 
+        if ($ARGV[0] ne '' ) {
+            if ($issuer =~ /$ARGV[0]/i) {
+               print $out;
+            }
+        }
+        else {
+            print $out;
+        }
+        $auth->clear();
+    }
+}
+else {
+    print "Error: No keys found\n";
+}
