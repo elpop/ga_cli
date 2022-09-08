@@ -6,7 +6,7 @@
 # Creation date => 06/September/2022                                #
 #-------------------------------------------------------------------#
 # Info => This program Read the /etc/ga_cli.conf file and generate  #
-#         QR images for Bulk load into the Google Authenticator App.#
+#         QR images for bulk load into the Google Authenticator App.#
 #-------------------------------------------------------------------#
 # This code are released under the GPL 3.0 License. Any change must #
 # be report to the authors                                          #
@@ -63,24 +63,30 @@ my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
 # Load config File
 my %key_ring = do "$work_dir\/keys";
 
-my %bulk_ring = ( 'version' => 1,
+my %export_ring = ( 'version' => 1,
                   'QRCount' => 1,
                   'QRIndex' => 0, );
 my $ga_qr = 'otpauth-migration://offline?data=';    
+
+# Date
+my ($year, $month, $day) = (localtime( time() ))[5,4,3];
+$year = $year + 1900;
+$month += 1;
+my $date = sprintf("%04d%02d%02d",$year,$month,$day);
 
 my $count = scalar(keys(%key_ring));
 my $images_count = int($count / 10);
 if ( ($count % 10) > 0) {
     $images_count++;
 }
-$bulk_ring{QRCount} = $images_count;
+$export_ring{QRCount} = $images_count;
 my $seq = 0;
 my $current = 1;
 
 # Load Protocol Buffer Array to process
 foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
     $seq++;
-    push @{$bulk_ring{'Index'}},
+    push @{$export_ring{'Index'}},
          ({
           'issuer'    => "$issuer",
           'keyid'     => "$key_ring{$issuer}{keyid}",
@@ -92,7 +98,7 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
     if ( ( ($seq % 10) == 0 )
         || ($seq == $count) ) {
         # Process Protocol Buffers from de MIME Base64 Data
-        my $protocol_buffer = GA->encode(\%bulk_ring);
+        my $protocol_buffer = GA->encode(\%export_ring);
 
         # Encode MIME Base64                
         my $mime_data = encode_base64($protocol_buffer);
@@ -112,9 +118,9 @@ foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
                 darkcolor     => Imager::Color->new(0, 0, 0),
         );
         my $img = $qrcode->plot("$ga_qr$mime_data");
-        my $qr_file = 'bulk_keys_' . sprintf("%02d",$current) . '_of_' . sprintf("%02d", $images_count) . '.jpg';
+        my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.jpg", $date, $current, $images_count);
         $img->write(file => "$qr_file");
-        $bulk_ring{'Index'} = ();
-        $bulk_ring{QRIndex} = $current++;
+        $export_ring{'Index'} = ();
+        $export_ring{QRIndex} = $current++;
     }
 }
