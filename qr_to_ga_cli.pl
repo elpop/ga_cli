@@ -65,6 +65,54 @@ my %key_ring = ();
 my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command arguments
 my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
 
+# Process the Protocol Buffers data
+sub process_pb_data {
+    my $qr_data_ref = shift;
+    # Check for "otpauth-migration://offline" in the QR info
+    if ($$qr_data_ref =~ /^otpauth-migration:\/\/offline/) {
+        
+        # only take the MIME Data on the QR message
+        my ($data) = $$qr_data_ref =~/data=(.*)/;
+        
+        # URL Decode
+        $data =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
+    
+        # Decode Base64 Info
+        my $mime_data = decode_base64($data);
+      
+        # Process Protocol Buffers from de MIME Base64 Data
+        my $protocol_buffer = GA->decode("$mime_data");
+        foreach my $ref (@{$protocol_buffer->{Index}}) {
+            
+            # convert the passwords in octal notation
+            $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
+    
+            # Assign values to the key ring
+            if ($ref->{issuer} ne '') {
+                $key_ring{$ref->{issuer}}{secret}    = $ref->{pass};
+                $key_ring{$ref->{issuer}}{keyid}     = $ref->{keyid};
+                $key_ring{$ref->{issuer}}{algorithm} = $ref->{algorithm};
+                $key_ring{$ref->{issuer}}{digits}    = $ref->{digits};
+                $key_ring{$ref->{issuer}}{type}      = $ref->{type};
+            }
+            else {
+                $key_ring{$ref->{keyid}}{secret}    = $ref->{pass};
+                $key_ring{$ref->{keyid}}{keyid}     = $ref->{keyid};
+                $key_ring{$ref->{keyid}}{algorithm} = $ref->{algorithm};
+                $key_ring{$ref->{keyid}}{digits}    = $ref->{digits};
+                $key_ring{$ref->{keyid}}{type}      = $ref->{type};
+            }
+        }
+    }
+    else {
+        print "Error: No Google Authenticator Export Data found\n";
+    }
+}
+
+#-----------#
+# Main body #
+#-----------#
+
 # create work directory if not exists
 unless (-f $work_dir) {
     mkdir($work_dir);
@@ -95,48 +143,10 @@ if ($#images >=0) {
         # Read QR Data
         foreach my $symbol ($image->get_symbols()) {
             ($qr_data) = $symbol->get_data();
+            # Process the Protocol Buffer Data
+            process_pb_data(\$qr_data);
         }
         undef($image);
-        
-        # Check for "otpauth-migration://offline" in the QR info
-        if ($qr_data =~ /^otpauth-migration:\/\/offline/) {
-            
-            # only take the MIME Data on the QR message
-            my ($data) = $qr_data =~/data=(.*)/;
-            
-            # URL Decode
-            $data =~ s/\%([A-Fa-f0-9]{2})/pack('C', hex($1))/seg;
-        
-            # Decode Base64 Info
-            my $mime_data = decode_base64($data);
-          
-            # Process Protocol Buffers from de MIME Base64 Data
-            my $protocol_buffer = GA->decode("$mime_data");
-            foreach my $ref (@{$protocol_buffer->{Index}}) {
-                
-                # convert the passwords in octal notation
-                $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
-        
-                # Assign values to the key ring
-                if ($ref->{issuer} ne '') {
-                    $key_ring{$ref->{issuer}}{secret}    = $ref->{pass};
-                    $key_ring{$ref->{issuer}}{keyid}     = $ref->{keyid};
-                    $key_ring{$ref->{issuer}}{algorithm} = $ref->{algorithm};
-                    $key_ring{$ref->{issuer}}{digits}    = $ref->{digits};
-                    $key_ring{$ref->{issuer}}{type}      = $ref->{type};
-                }
-                else {
-                    $key_ring{$ref->{keyid}}{secret}    = $ref->{pass};
-                    $key_ring{$ref->{keyid}}{keyid}     = $ref->{keyid};
-                    $key_ring{$ref->{keyid}}{algorithm} = $ref->{algorithm};
-                    $key_ring{$ref->{keyid}}{digits}    = $ref->{digits};
-                    $key_ring{$ref->{keyid}}{type}      = $ref->{type};
-                }
-            }
-        }
-        else {
-            print "Error: No Google Authenticator Export Data found\n";
-        }
     }
     # if have valid keys, write configuration file
     if ( scalar(keys %key_ring) > 0 ) {
