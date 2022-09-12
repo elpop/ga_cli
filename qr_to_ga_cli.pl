@@ -68,6 +68,7 @@ my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # key directory
 # Process the Protocol Buffers data
 sub process_pb_data {
     my $qr_data_ref = shift;
+    
     # Check for "otpauth-migration://offline" in the QR info
     if ($$qr_data_ref =~ /^otpauth-migration:\/\/offline/) {
         
@@ -148,6 +149,7 @@ if ($#images >=0) {
         }
         undef($image);
     }
+    
     # if have valid keys, write configuration file
     if ( scalar(keys %key_ring) > 0 ) {
         

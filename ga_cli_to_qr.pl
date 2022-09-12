@@ -54,17 +54,20 @@ Google::ProtocolBuffers->parse("
      {create_accessors => 1}
 );
 
-# Load config File
-my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # keys directory
-my %key_ring = do "$work_dir\/keys";
-
 # Work variables
+my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # keys directory
 my %export_ring = ( 'version' => 1,
                     'QRCount' => 1,
                     'QRIndex' => 0, );
 my $ga_qr = 'otpauth-migration://offline?data='; # GA export accounts header on QR
 my $key_counter = 0;
 my $current = 1;
+
+# Load config File
+my %key_ring = ();
+if (-f "$work_dir\/keys") {
+    %key_ring = do "$work_dir\/keys";
+}
 
 # Date
 my ($year, $month, $day) = (localtime( time() ))[5,4,3];
@@ -73,56 +76,63 @@ $month += 1;
 my $date = sprintf("%04d%02d%02d",$year,$month,$day);
 
 # Obtain keys to process
-my $total_keys = scalar(keys(%key_ring));
+my $total_keys = scalar(keys %key_ring);
 my $images_count = int($total_keys / 10);
 if ( ($total_keys % 10) > 0) {
     $images_count++;
 }
 $export_ring{QRCount} = $images_count;
 
-# Load Protocol Buffer Array to process
-foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
-    $key_counter++;
-    push @{$export_ring{'Index'}},
-         ({
-          'issuer'    => "$issuer",
-          'keyid'     => "$key_ring{$issuer}{keyid}",
-          'pass'      => "$key_ring{$issuer}{secret}",
-          'algorithm' => $key_ring{$issuer}{algorithm},
-          'digits'    => $key_ring{$issuer}{digits},
-          'type'      => $key_ring{$issuer}{type},
-         });
+# If have keys to process
+if ($total_keys > 0) {
 
-    # Generate QR each 10 keys    
-    if ( ( ($key_counter % 10) == 0 )
-        || ($key_counter == $total_keys) ) {
-        
-        # Process Protocol Buffers from de MIME Base64 Data
-        my $protocol_buffer = GA->encode(\%export_ring);
-
-        # Encode MIME Base64                
-        my $mime_data = encode_base64($protocol_buffer);
-        
-        # URL Encode
-        $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-        $mime_data =~ s/\%0A//g; # avoid new line
-        
-        # generate QR image
-        my $qrcode = Imager::QRCode->new(
-                size          => 4,
-                margin        => 1,
-                version       => 1,
-                level         => 'M',
-                casesensitive => 1,
-                lightcolor    => Imager::Color->new(255, 255, 255),
-                darkcolor     => Imager::Color->new(0, 0, 0),
-        );
-        my $img = $qrcode->plot("$ga_qr$mime_data");
-        my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.jpg", $date, $current, $images_count);
-        $img->write(file => "$qr_file");
-        
-        # Clean Up the has for the next 10 keys
-        $export_ring{'Index'} = ();
-        $export_ring{QRIndex} = $current++; # Next batch number
+    # Load Protocol Buffer Array to process
+    foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
+        $key_counter++;
+        push @{$export_ring{'Index'}},
+             ({
+              'issuer'    => "$issuer",
+              'keyid'     => "$key_ring{$issuer}{keyid}",
+              'pass'      => "$key_ring{$issuer}{secret}",
+              'algorithm' => $key_ring{$issuer}{algorithm},
+              'digits'    => $key_ring{$issuer}{digits},
+              'type'      => $key_ring{$issuer}{type},
+             });
+    
+        # Generate QR each 10 keys    
+        if ( ( ($key_counter % 10) == 0 )
+            || ($key_counter == $total_keys) ) {
+            
+            # Process Protocol Buffers from de MIME Base64 Data
+            my $protocol_buffer = GA->encode(\%export_ring);
+    
+            # Encode MIME Base64                
+            my $mime_data = encode_base64($protocol_buffer);
+            
+            # URL Encode
+            $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
+            $mime_data =~ s/\%0A//g; # avoid new line
+            
+            # generate QR image
+            my $qrcode = Imager::QRCode->new(
+                    size          => 4,
+                    margin        => 1,
+                    version       => 1,
+                    level         => 'M',
+                    casesensitive => 1,
+                    lightcolor    => Imager::Color->new(255, 255, 255),
+                    darkcolor     => Imager::Color->new(0, 0, 0),
+            );
+            my $img = $qrcode->plot("$ga_qr$mime_data");
+            my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.jpg", $date, $current, $images_count);
+            $img->write(file => "$qr_file");
+            
+            # Clean Up the has for the next 10 keys
+            $export_ring{'Index'} = ();
+            $export_ring{QRIndex} = $current++; # Next batch number
+        }
     }
+}
+else {
+    print "Error: No keys to process\n";
 }
