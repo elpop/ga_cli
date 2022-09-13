@@ -1,18 +1,18 @@
 #!/usr/bin/perl
-#===================================================================#
-# Program => ga_cli.pl (In Perl 5.0)                  version 0.0.1 #
-#===================================================================#
-# Autor         => Fernando "El Pop" Romo        (pop@cofradia.org) #
-# Creation date => 01/September/2022                                #
-#-------------------------------------------------------------------#
-# Info => This program is a CLI version of the Google Authenticator #
-#         App. Read de conf file generated with the program         #
-#         qr_to_ga_cli.pl and show the OTP from sites               #
-#-------------------------------------------------------------------#
-# This code are released under the GPL 3.0 License. Any change must #
-# be report to the authors                                          #
-#                 (c) 2022 - Fernando Romo                          #
-#===================================================================#
+#=====================================================================#
+# Program => ga_cli.pl (In Perl 5.0)                    version 0.0.1 #
+#=====================================================================#
+# Autor         => Fernando "El Pop" Romo          (pop@cofradia.org) #
+# Creation date => 01/September/2022                                  #
+#---------------------------------------------------------------------#
+# Info => This program is a CLI version of the Google Authenticator   #
+#         App. Read the configuration file generated with the program #
+#         qr_to_ga_cli.pl and show the OTP from sites                 #
+#---------------------------------------------------------------------#
+# This code are released under the GPL 3.0 License. Any change must   #
+# be report to the authors                                            #
+#                     (c) 2022 - Fernando Romo                        #
+#=====================================================================#
 use strict;
 use Auth::GoogleAuth;
 use Convert::Base32;

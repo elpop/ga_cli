@@ -1,17 +1,17 @@
 #!/usr/bin/perl
-#===================================================================#
-# Program => ga_cli_to_qr.pl (In Perl 5.0)            version 0.0.1 #
-#===================================================================#
-# Autor         => Fernando "El Pop" Romo        (pop@cofradia.org) #
-# Creation date => 06/September/2022                                #
-#-------------------------------------------------------------------#
-# Info => This program Read the /etc/ga_cli.conf file and generate  #
-#         QR images for bulk load into the Google Authenticator App.#
-#-------------------------------------------------------------------#
-# This code are released under the GPL 3.0 License. Any change must #
-# be report to the authors                                          #
-#                 (c) 2022 - Fernando Romo                          #
-#===================================================================#
+#====================================================================#
+# Program => ga_cli_to_qr.pl (In Perl 5.0)             version 0.0.1 #
+#====================================================================#
+# Autor         => Fernando "El Pop" Romo        (pop@cofradia.org)  #
+# Creation date => 06/September/2022                                 #
+#--------------------------------------------------------------------#
+# Info => This program Read the $HOME/.ga_cli/keys file and generate #
+#         QR images for bulk load into the Google Authenticator App. #
+#--------------------------------------------------------------------#
+# This code are released under the GPL 3.0 License. Any change must  #
+# be report to the authors                                           #
+#                 (c) 2022 - Fernando Romo                           #
+#====================================================================#
 use strict;
 use MIME::Base64; 
 use Google::ProtocolBuffers;
