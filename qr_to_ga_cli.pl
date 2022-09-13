@@ -95,6 +95,7 @@ sub process_pb_data {
                 $key_ring{$ref->{issuer}}{algorithm} = $ref->{algorithm};
                 $key_ring{$ref->{issuer}}{digits}    = $ref->{digits};
                 $key_ring{$ref->{issuer}}{type}      = $ref->{type};
+                print "    $ref->{issuer}\n";
             }
             else {
                 $key_ring{$ref->{keyid}}{secret}    = $ref->{pass};
@@ -102,6 +103,7 @@ sub process_pb_data {
                 $key_ring{$ref->{keyid}}{algorithm} = $ref->{algorithm};
                 $key_ring{$ref->{keyid}}{digits}    = $ref->{digits};
                 $key_ring{$ref->{keyid}}{type}      = $ref->{type};
+                print "    $ref->{keyid}\n";
             }
         }
     }
@@ -125,6 +127,8 @@ if ($#images >=0) {
     # Process images
     foreach my $image (@images) {
         
+        print "$image\n";
+
         # Prepare to Read the QR using ZBar libs
         my $scanner = Barcode::ZBar::ImageScanner->new();
         $scanner->parse_config("enable");
@@ -172,6 +176,8 @@ if ($#images >=0) {
         }
         print CONF ");\n";
         close(CONF);
+        
+        print scalar(keys %key_ring) . " keys process\n";
     }
 }
 # If you don't give any file, print help

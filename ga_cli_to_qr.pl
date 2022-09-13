@@ -127,11 +127,15 @@ if ($total_keys > 0) {
             my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.jpg", $date, $current, $images_count);
             $img->write(file => "$qr_file");
             
+            # Show progress
+            print "$qr_file\n";
+            
             # Clean Up the has for the next 10 keys
             $export_ring{'Index'} = ();
             $export_ring{QRIndex} = $current++; # Next batch number
         }
     }
+    print "$total_keys keys process\n";
 }
 else {
     print "Error: No keys to process\n";
