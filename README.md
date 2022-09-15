@@ -82,15 +82,20 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
 2. Transport the image to the Desktop computer and run the key extractor program:
 
     ```   
-    ./qr_to_ga_cli.pl export_accounts_sample.jpg
+    ./ga_cli.pl -v -i export_accounts_sample.jpg 
+    export_accounts_sample.jpg
+        OpenEnchilada
+    1 keys process
     ```
+    
+    The options for import the QR are '-import' or '-i', the '-verbose' or '-v' is to show progress.
     
     JPG and PNG formats are supported.
     
     You can process multiple images when Google Authenticator make more than one QR:
 
     ```   
-    ./qr_to_ga_cli.pl qr_one.jpg qr_two.jpg ...
+    ./qr_to_ga_cli.pl -v -i qr_one.jpg qr_two.jpg ...
     ```
     
     This program generate a file called "keys" on the path "$HOME/.ga_cli", is a perl hash definition with the information of your accounts.
@@ -142,8 +147,12 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     You can generate a full backup of your keys generating Multiple QR images to use with the Google Authenticator App:
     
     ```
-    ./ga_cli_to_qr.pl
+    ./ga_cli.pl -e -v
+    export_keys_20220915_01_of_01.jpg
+    1 keys process
     ```
+    
+    The option '-export' or '-e' create the QR images.
     
     The program take all the keys defined on the "$HOME/.ga_cli/keys" file and create a set of files (depending of the keys quantity) named "export_keys_YYYYMMDD_XX_of_ZZ.jpg". where XX is the sequence and ZZ the total images on the set.
     
