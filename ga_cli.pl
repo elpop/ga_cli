@@ -107,7 +107,7 @@ sub date {
    return sprintf("%04d%02d%02d",$year,$month,$day);
 }
 
-# Read the QR data adn process keys
+# Read the QR data and process keys
 sub import_qr {
     my $qr_data = '';
     my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command arguments
@@ -115,7 +115,7 @@ sub import_qr {
     # Clean key_ring
     %key_ring = ();
     
-    #Internal  
+    #Internal function to process Protocol Buffer Data 
     sub _process_pb_data {
         my $qr_data_ref = shift;
       
