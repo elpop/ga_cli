@@ -367,15 +367,23 @@ ga_cli.pl [options] {file ...}
 
 =over 8
 
+=item B<None>
+
+Show the TOTP of each account.
+
+ga_cli.pl
+
+    OpenEnchilada  972144
+    
 =item B<-import or -i>
 
-Import given QR image file
+Import given QR image file:
 
 ga_cli.pl -import export_accounts_sample.jpg
 
 =item B<-export or -e>
 
-Create QR images for export
+Create QR images for export:
 
 ga_cli.pl -export
 
