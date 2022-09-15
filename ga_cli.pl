@@ -352,14 +352,16 @@ else {
     print "Error: No keys found\n";
 }
 
+# Help info for use with Pod::Usage
 __END__
+
 =head1 NAME
 
 ga_cli.pl
 
 =head1 SYNOPSIS
 
-ga_cli [options] {file ...}
+ga_cli.pl [options] {file ...}
 
 =head1 OPTIONS
 
@@ -369,13 +371,17 @@ ga_cli [options] {file ...}
 
 Import given QR image file
 
+ga_cli.pl -import export_accounts_sample.jpg
+
 =item B<-export or -e>
 
 Create QR images for export
 
+ga_cli.pl -export
+
 =item B<-verbose or -v>
 
-Show progress 
+Show progress when using -import or -export options
 
 =item B<-help or -h>
 
