@@ -106,9 +106,12 @@ sub date {
 sub import_qr {
     my $qr_data = '';
     my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command arguments
-
+    
+    # Clean key_ring
+    %key_ring = ();
+    
     #Internal  
-   sub _process_pb_data {
+    sub _process_pb_data {
         my $qr_data_ref = shift;
       
         # Check for "otpauth-migration://offline" in the QR info
