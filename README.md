@@ -9,38 +9,38 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
 ## Summary
 
     ```
-    ./ga_cli.pl -h
-   Usage:
-       ga_cli.pl [options] {file ...}
-   
-   Options:
-       None    Show the TOTP of each account.
-   
-               ga_cli.pl
-   
-                   OpenEnchilada  972144
-   
-       -import or -i
-               Import given QR image file:
-   
-               ga_cli.pl -import export_accounts_sample.jpg
-   
-               The QR image can be the full Google Authenticator Export Set or
-               a single account for add to the key ring
-   
-       -export or -e
-               Create QR images for export:
-   
-               ga_cli.pl -export
-   
-       -clear or -c
-               Delete the key ring, works with -import or -export options
-   
-       -verbose or -v
-               Show progress when using -import or -export options
-   
-       -help or -h
-               Show this help
+./ga_cli.pl -h
+Usage:
+    ga_cli.pl [options] {file ...}
+
+Options:
+    None    Show the TOTP of each account.
+
+            ga_cli.pl
+
+                OpenEnchilada  972144
+
+    -import or -i
+            Import given QR image file:
+
+            ga_cli.pl -import export_accounts_sample.jpg
+
+            The QR image can be the full Google Authenticator Export Set or
+            a single account for add to the key ring
+
+    -export or -e
+            Create QR images for export:
+
+            ga_cli.pl -export
+
+    -clear or -c
+            Delete the key ring, works with -import or -export options
+
+    -verbose or -v
+            Show progress when using -import or -export options
+
+    -help or -h or -?
+            Show this help
     ```
     
 ## Install
