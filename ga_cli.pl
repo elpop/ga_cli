@@ -78,7 +78,7 @@ my %options = ();
 
 # Command Line options
 GetOptions(\%options,
-           'import',
+           'import=s@{1,}',
            'export',
            'clear',
            'verbose',
@@ -121,7 +121,7 @@ sub write_conf {
 # Read the QR data and process keys
 sub import_qr {
     my $qr_data = '';
-    my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command arguments
+    my @images = grep {/\.(jpg|jpeg|png)$/} @{$options{'import'}}; # filter image files from command arguments
     
     # Clean key_ring
     %key_ring = () if ($options{'clear'});
