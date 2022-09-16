@@ -76,10 +76,12 @@ my $import   = 0;
 my $export   = 0;
 my $verbose  = 0;
 my $help     = 0;
+my $clear    = 0;
 
 # Search options
 GetOptions('import|i'  => \$import,
            'export|e'  => \$export,
+           'clear|c'   => \$clear,
            'verbose|v' => \$verbose,
            'help|h'    => \$help);
 
@@ -107,16 +109,44 @@ sub date {
    return sprintf("%04d%02d%02d",$year,$month,$day);
 }
 
+# Write Keys configuration
+sub write_conf {
+       
+    # make a backup (just in case).
+    if (-f "$work_dir\/keys") {
+        move("$work_dir\/keys", "$work_dir\/keys.back");
+    }
+  
+    # Create and write a conf file called "keys"
+    open(CONF, ">:encoding(UTF-8)","$work_dir\/keys") or die "Can't create conf file: $!";
+    print CONF "(\n";
+    foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
+        print CONF "    '$issuer' => {\n";
+        print CONF "        keyid     => '$key_ring{$issuer}{keyid}',\n";
+        # convert the passwords in octal notation
+        $key_ring{$issuer}{secret} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
+        print CONF "        secret    => \"$key_ring{$issuer}{secret}\",\n";
+        print CONF "        algorithm => $key_ring{$issuer}{algorithm},\n";
+        print CONF "        digits    => $key_ring{$issuer}{digits},\n";
+        print CONF "        type      => $key_ring{$issuer}{type},\n";
+        print CONF "    },\n";
+    }
+    print CONF ");\n";
+    close(CONF);
+  
+    print scalar(keys %key_ring) . " keys on key ring\n" if ($verbose);
+}
+
 # Read the QR data and process keys
 sub import_qr {
     my $qr_data = '';
     my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command arguments
     
     # Clean key_ring
-    %key_ring = ();
+    %key_ring = () if ($clear);
     
-    #Internal function to process Protocol Buffer Data 
-    sub _process_pb_data {
+    #Internal function to process Data 
+    sub _process_data {
         my $qr_data_ref = shift;
       
         # Check for "otpauth-migration://offline" in the QR info
@@ -136,9 +166,6 @@ sub import_qr {
             
             foreach my $ref (@{$protocol_buffer->{Index}}) {
               
-                # convert the passwords in octal notation
-                $ref->{pass} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
-      
                 # Assign values to the key ring
                 if ($ref->{issuer} ne '') {
                     $key_ring{$ref->{issuer}}{secret}    = $ref->{pass};
@@ -156,6 +183,43 @@ sub import_qr {
                     $key_ring{$ref->{keyid}}{type}      = $ref->{type};
                     print "    $ref->{keyid}\n" if ($verbose);
                 }
+            }
+        }
+        # Check for "otpauth://totp/" in the QR info for add a single key
+        elsif ($$qr_data_ref =~ /^otpauth:\/\/totp/) {
+
+            # Obtain values
+            my ($keyid, $secret32, $issuer) = $$qr_data_ref =~ /totp\/.*?\:(.*)\?secret\=(.*)\&issuer=(.*)/;
+
+            # if have minimun info to add key
+            if ($keyid && $secret32) {
+
+                # Decode de Base32 pass
+                my $secret = decode_base32( $secret32);
+               
+                # convert the passwords in octal notation
+                $secret =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
+
+                # Assign values to the key ring
+                if ($issuer ne '') {
+                    $key_ring{$issuer}{secret}    = $secret;
+                    $key_ring{$issuer}{keyid}     = $keyid;
+                    $key_ring{$issuer}{algorithm} = 1;
+                    $key_ring{$issuer}{digits}    = 1;
+                    $key_ring{$issuer}{type}      = 2;
+                    print "    $issuer\n" if ($verbose);
+                }
+                else {
+                    $key_ring{$keyid}{secret}    = $secret;
+                    $key_ring{$keyid}{keyid}     = $keyid;
+                    $key_ring{$keyid}{algorithm} = 1;
+                    $key_ring{$keyid}{digits}    = 1;
+                    $key_ring{$keyid}{type}      = 2;
+                    print "    $keyid\n" if ($verbose);
+                }
+            }
+            else {
+                print "Error: No account to add to key ring\n";
             }
         }
         else {
@@ -196,36 +260,11 @@ sub import_qr {
             foreach my $symbol ($image->get_symbols()) {
                 ($qr_data) = $symbol->get_data();
                 # Process the Protocol Buffer Data
-                _process_pb_data(\$qr_data);
+                _process_data(\$qr_data);
             }
             undef($image);
-        }
-        
-        # if have valid keys, write configuration file
-        if ( scalar(keys %key_ring) > 0 ) {
-            
-            # make a backup (just in case).
-            if (-f "$work_dir\/keys") {
-                move("$work_dir\/keys", "$work_dir\/keys.back");
-            }
-            
-            # Create and write a conf file called "keys"
-            open(CONF, ">:encoding(UTF-8)","$work_dir\/keys") or die "Can't create conf file: $!";
-            print CONF "(\n";
-            foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
-                print CONF "    '$issuer' => {\n";
-                print CONF "        keyid     => '$key_ring{$issuer}{keyid}',\n";
-                print CONF "        secret    => \"$key_ring{$issuer}{secret}\",\n";
-                print CONF "        algorithm => $key_ring{$issuer}{algorithm},\n";
-                print CONF "        digits    => $key_ring{$issuer}{digits},\n";
-                print CONF "        type      => $key_ring{$issuer}{type},\n";
-                print CONF "    },\n";
-            }
-            print CONF ");\n";
-            close(CONF);
-            
-            print scalar(keys %key_ring) . " keys process\n" if ($verbose);
-        }
+        }        
+        write_conf();
     }
     # If you don't give any file, print help
     else {
@@ -236,6 +275,7 @@ sub import_qr {
 
 # export Keys to QR for load in Google Authenticator
 sub export_qr {
+   
     # Obtain keys to process
     my $total_keys = scalar(keys %key_ring);
     my $images_count = int($total_keys / 10);
@@ -302,7 +342,11 @@ sub export_qr {
                 $export_ring{QRIndex} = $current++; # Next batch number
             }
         }
-        print "$total_keys keys process\n" if ($verbose);
+        # Clean key_ring
+        if ($clear) {
+            %key_ring = ();
+            write_conf();
+        }
     }
     else {
         print "Error: No keys to process\n";
@@ -381,11 +425,17 @@ Import given QR image file:
 
 ga_cli.pl -import export_accounts_sample.jpg
 
+The QR image can be the full Google Authenticator Export Set or a single account for add to the key ring
+
 =item B<-export or -e>
 
 Create QR images for export:
 
 ga_cli.pl -export
+
+=item B<-clear or -c>
+
+Delete the key ring, works with -import or -export options
 
 =item B<-verbose or -v>
 
