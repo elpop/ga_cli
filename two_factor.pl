@@ -25,9 +25,9 @@ sub semaphore {
 if ($ARGV[0] ne '') {
     # Define credentials used by Auth::GoogleAuth  
     my $auth = Auth::GoogleAuth->new({
-           secret => 'Another silly passphrase',
-           issuer => 'OpenEnchilada',
-           key_id => '@El_Pop',
+           secret => 'Yabba Dabba Doo!',
+           issuer => 'Flintstones',
+           key_id => '@Fred',
        });
     # use Base32, in case you want to store the passphrase, take this value.
     $auth->secret32( encode_base32( $auth->secret() ) );
