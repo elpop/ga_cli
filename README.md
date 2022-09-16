@@ -163,8 +163,47 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     export_keys_20220908_02_of_03.jpg
     export_keys_20220908_03_of_03.jpg
     ```
-    
-5. The two_factor.pl program
+
+5. Program help
+
+    You can access the help via the -help or -h option:
+
+    ```
+    ./ga_cli.pl -h
+   Usage:
+       ga_cli.pl [options] {file ...}
+   
+   Options:
+       None    Show the TOTP of each account.
+   
+               ga_cli.pl
+   
+                   OpenEnchilada  972144
+   
+       -import or -i
+               Import given QR image file:
+   
+               ga_cli.pl -import export_accounts_sample.jpg
+   
+               The QR image can be the full Google Authenticator Export Set or
+               a single account for add to the key ring
+   
+       -export or -e
+               Create QR images for export:
+   
+               ga_cli.pl -export
+   
+       -clear or -c
+               Delete the key ring, works with -import or -export options
+   
+       -verbose or -v
+               Show progress when using -import or -export options
+   
+       -help or -h
+               Show this help
+    ```
+
+6. The two_factor.pl program
 
     Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
