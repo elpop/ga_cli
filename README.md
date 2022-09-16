@@ -248,7 +248,7 @@ Options:
 
 ## To-Do
 
-    '-add' option to add a key with manual parameters to the key ring (no via QR).
+    -add option to add a key with manual parameters to the key ring (no via QR).
 
 ## Author
 
