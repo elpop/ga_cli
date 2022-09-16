@@ -9,7 +9,6 @@ Program to take the accounts of the Authenticator App, via one snapshot of the E
 ## Summary
 
 ```
-./ga_cli.pl -h
 Usage:
     ga_cli.pl [options] {file ...}
 
@@ -29,12 +28,14 @@ Options:
             a single account for add to the key ring
 
     -export or -e
-            Create QR images for export:
+            Create QR images for export to Googla Authenticator App:
 
             ga_cli.pl -export
 
     -clear or -c
-            Delete the key ring, works with -import or -export options
+            Delete the key ring, works with -import or -export options. When
+            use -import, Init the key ring an load new values. With -export,
+            generate the QR images and delete the key ring.
 
     -verbose or -v
             Show progress when using -import or -export options

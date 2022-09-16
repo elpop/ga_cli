@@ -72,20 +72,16 @@ Google::ProtocolBuffers->parse("
 # Work variables
 my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # keys directory
 my %key_ring = ();
+my %options = ();
 
-# Options flags
-my $import   = 0;
-my $export   = 0;
-my $verbose  = 0;
-my $help     = 0;
-my $clear    = 0;
-
-# Search options
-GetOptions('import'  => \$import,
-           'export'  => \$export,
-           'clear'   => \$clear,
-           'verbose' => \$verbose,
-           'help|?'  => \$help);
+# Command Line options
+GetOptions(\%options,
+           'import',
+           'export',
+           'clear',
+           'verbose',
+           'help|?',
+);
 
 # Load config File
 if (-f "$work_dir\/keys") {
@@ -117,7 +113,7 @@ sub write_conf {
     print CONF ");\n";
     close(CONF);
   
-    print scalar(keys %key_ring) . " keys on key ring\n" if ($verbose);
+    print scalar(keys %key_ring) . " keys on key ring\n" if ($options{'verbose'});
 } # End sub write_conf()
 
 # Read the QR data and process keys
@@ -126,7 +122,7 @@ sub import_qr {
     my @images = grep {/\.(jpg|jpeg|png)$/} @ARGV; # filter image files from command arguments
     
     # Clean key_ring
-    %key_ring = () if ($clear);
+    %key_ring = () if ($options{'clear'});
     
     #Internal function to process Data 
     sub _process_data {
@@ -156,7 +152,7 @@ sub import_qr {
                     $key_ring{$ref->{issuer}}{algorithm} = $ref->{algorithm};
                     $key_ring{$ref->{issuer}}{digits}    = $ref->{digits};
                     $key_ring{$ref->{issuer}}{type}      = $ref->{type};
-                    print "    $ref->{issuer}\n" if ($verbose);
+                    print "    $ref->{issuer}\n" if ($options{'verbose'});
                 }
                 else {
                     $key_ring{$ref->{keyid}}{secret}    = $ref->{pass};
@@ -164,7 +160,7 @@ sub import_qr {
                     $key_ring{$ref->{keyid}}{algorithm} = $ref->{algorithm};
                     $key_ring{$ref->{keyid}}{digits}    = $ref->{digits};
                     $key_ring{$ref->{keyid}}{type}      = $ref->{type};
-                    print "    $ref->{keyid}\n" if ($verbose);
+                    print "    $ref->{keyid}\n" if ($options{'verbose'});
                 }
             }
         }
@@ -187,7 +183,7 @@ sub import_qr {
                     $key_ring{$issuer}{algorithm} = 1;
                     $key_ring{$issuer}{digits}    = 1;
                     $key_ring{$issuer}{type}      = 2;
-                    print "    $issuer\n" if ($verbose);
+                    print "    $issuer\n" if ($options{'verbose'});
                 }
                 else {
                     $key_ring{$keyid}{secret}    = $secret;
@@ -195,7 +191,7 @@ sub import_qr {
                     $key_ring{$keyid}{algorithm} = 1;
                     $key_ring{$keyid}{digits}    = 1;
                     $key_ring{$keyid}{type}      = 2;
-                    print "    $keyid\n" if ($verbose);
+                    print "    $keyid\n" if ($options{'verbose'});
                 }
             }
             else {
@@ -218,7 +214,7 @@ sub import_qr {
         # Process images
         foreach my $image (@images) {
             
-            print "$image\n" if ($verbose);
+            print "$image\n" if ($options{'verbose'});
     
             # Prepare to Read the QR using ZBar libs
             my $scanner = Barcode::ZBar::ImageScanner->new();
@@ -323,7 +319,7 @@ sub export_qr {
                 $img->write(file => "$qr_file");
                 
                 # Show progress
-                print "$qr_file\n" if ($verbose);
+                print "$qr_file\n" if ($options{'verbose'});
                 
                 # Clean Up the has for the next 10 keys
                 $export_ring{'Index'} = ();
@@ -331,7 +327,7 @@ sub export_qr {
             }
         }
         # Clean key_ring
-        if ($clear) {
+        if ($options{'clear'}) {
             %key_ring = ();
             write_conf();
         }
@@ -381,14 +377,14 @@ sub otp {
 # Main body #
 #-----------#
 
-if ($help) {
+if ($options{'help'}) {
     pod2usage(-exitval => 0, -verbose => 1);
     pod2usage(2);
 }
-elsif ($import) {
+elsif ($options{'import'}) {
     import_qr();
 }
-elsif ($export) {
+elsif ($options{'export'}) {
     export_qr();
 }
 # if have valid keys, process
@@ -433,13 +429,15 @@ The QR image can be the full Google Authenticator Export Set or a single account
 
 =item B<-export or -e>
 
-Create QR images for export:
+Create QR images for export to Googla Authenticator App:
 
 ga_cli.pl -export
 
 =item B<-clear or -c>
 
-Delete the key ring, works with -import or -export options
+Delete the key ring, works with -import or -export options.
+When use -import, Init the key ring an load new values.
+With -export, generate the QR images and delete the key ring.
 
 =item B<-verbose or -v>
 
