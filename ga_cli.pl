@@ -72,6 +72,8 @@ Google::ProtocolBuffers->parse("
 # Work variables
 my $work_dir = $ENV{'HOME'} . '/.ga_cli'; # keys directory
 my %key_ring = ();
+
+# Options flags
 my $import   = 0;
 my $export   = 0;
 my $verbose  = 0;
@@ -79,11 +81,11 @@ my $help     = 0;
 my $clear    = 0;
 
 # Search options
-GetOptions('import|i'  => \$import,
-           'export|e'  => \$export,
-           'clear|c'   => \$clear,
-           'verbose|v' => \$verbose,
-           'help|h'    => \$help);
+GetOptions('import'  => \$import,
+           'export'  => \$export,
+           'clear'   => \$clear,
+           'verbose' => \$verbose,
+           'help|?'  => \$help);
 
 # Load config File
 if (-f "$work_dir\/keys") {
@@ -443,7 +445,7 @@ Delete the key ring, works with -import or -export options
 
 Show progress when using -import or -export options
 
-=item B<-help or -h>
+=item B<-help or -h or -?>
 
 Show this help
 
