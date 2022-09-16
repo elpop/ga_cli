@@ -8,7 +8,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
 
 ## Summary
 
-    ```
+```
 ./ga_cli.pl -h
 Usage:
     ga_cli.pl [options] {file ...}
@@ -41,7 +41,7 @@ Options:
 
     -help or -h or -?
             Show this help
-    ```
+```
     
 ## Install
 
