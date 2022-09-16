@@ -246,6 +246,10 @@ Options:
     
     ![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
 
+## To-Do
+
+    '-add' option to add a key with manual parameters to the key ring (no via QR).
+
 ## Author
 
    Fernando Romo (pop@cofradia.org)
