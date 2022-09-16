@@ -109,7 +109,15 @@ Options:
     sudo dnf install perl-Convert-Base32 perl-MIME-Base64 ImageMagick-perl 
     sudo cpan install Imager::QRCode Barcode::ZBar Auth::GoogleAuth Google::ProtocolBuffers
     ```
+
+3. Put on your search path
     
+    Copy the ga_cli.pl program somewhere in your search path:
+    
+    ```
+    cp ga_cli.pl /usr/local/bin/.
+    ```
+
 ## Usage
 
 1. First with use th Google Authenticator App and use The "Export accounts" option, follow the guide and select one or all your accounts, The App has an option to delete the exported accounts, DON'T DELETE YOUR INFO, we use the QR generated like this example:
@@ -151,12 +159,6 @@ Options:
             type      => 2,
         },
     );
-    ```
-    
-    If you want, you can move or copy the ga_cli.pl program somewhere in your search path:
-    
-    ```
-    cp ga_cli.pl /usr/local/bin/.
     ```
     
 3. Use the Google Authenticator CLI Tool
