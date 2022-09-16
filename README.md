@@ -5,6 +5,43 @@
 Command Line version of the Google Authenticator App.
 
 Is a set of programs to take the accounts of the Authenticator App, via one snapshot of the Export accounts option, Read de QR Code, Decode the Mime Base64 data, process with protoc (Google Protocol Buffers Compiler) and make a conf file to work with.
+
+## Summary
+
+    ```
+    ./ga_cli.pl -h
+   Usage:
+       ga_cli.pl [options] {file ...}
+   
+   Options:
+       None    Show the TOTP of each account.
+   
+               ga_cli.pl
+   
+                   OpenEnchilada  972144
+   
+       -import or -i
+               Import given QR image file:
+   
+               ga_cli.pl -import export_accounts_sample.jpg
+   
+               The QR image can be the full Google Authenticator Export Set or
+               a single account for add to the key ring
+   
+       -export or -e
+               Create QR images for export:
+   
+               ga_cli.pl -export
+   
+       -clear or -c
+               Delete the key ring, works with -import or -export options
+   
+       -verbose or -v
+               Show progress when using -import or -export options
+   
+       -help or -h
+               Show this help
+    ```
     
 ## Install
 
@@ -85,7 +122,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ./ga_cli.pl -v -i export_accounts_sample.jpg 
     export_accounts_sample.jpg
         OpenEnchilada
-    1 keys process
+    1 keys on key ring
     ```
     
     The options for import the QR are '-import' or '-i', the '-verbose' or '-v' is to show progress.
@@ -149,7 +186,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     ```
     ./ga_cli.pl -e -v
     export_keys_20220915_01_of_01.jpg
-    1 keys process
+    1 keys on key ring
     ```
     
     The option '-export' or '-e' create the QR images.
@@ -164,46 +201,7 @@ Is a set of programs to take the accounts of the Authenticator App, via one snap
     export_keys_20220908_03_of_03.jpg
     ```
 
-5. Program help
-
-    You can access the help via the -help or -h option:
-
-    ```
-    ./ga_cli.pl -h
-   Usage:
-       ga_cli.pl [options] {file ...}
-   
-   Options:
-       None    Show the TOTP of each account.
-   
-               ga_cli.pl
-   
-                   OpenEnchilada  972144
-   
-       -import or -i
-               Import given QR image file:
-   
-               ga_cli.pl -import export_accounts_sample.jpg
-   
-               The QR image can be the full Google Authenticator Export Set or
-               a single account for add to the key ring
-   
-       -export or -e
-               Create QR images for export:
-   
-               ga_cli.pl -export
-   
-       -clear or -c
-               Delete the key ring, works with -import or -export options
-   
-       -verbose or -v
-               Show progress when using -import or -export options
-   
-       -help or -h
-               Show this help
-    ```
-
-6. The two_factor.pl program
+5. The two_factor.pl program
 
     Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
