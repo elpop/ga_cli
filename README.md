@@ -4,7 +4,7 @@
 
 Command Line version of the Google Authenticator App.
 
-Programs to take the accounts of the Authenticator App, via one snapshot of the Export accounts option, Read de QR Code, Decode the Mime Base64 data, process with protoc (Google Protocol Buffers Compiler) and make a conf file to work with.
+Program to take the accounts of the Authenticator App, via one snapshot of the Export accounts option, Read de QR Code, Decode the Mime Base64 data, process with protoc (Google Protocol Buffers Compiler) and make a conf file to work with.
 
 ## Summary
 
