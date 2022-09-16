@@ -90,25 +90,6 @@ if (-f "$work_dir\/keys") {
     %key_ring = do "$work_dir\/keys";
 }
 
-# Show Green or Red Text if the timer change
-sub semaphore {
-    my ($seconds) = (localtime( time() ))[0];
-    my $aux = $seconds % 30;
-    my $color = FG_RED;
-    if ($aux <= 25) {
-       $color = FG_GREEN;
-    }
-    return $color;
-}
-
-# Date to put on export QR files
-sub date {
-    my ($year, $month, $day) = (localtime( time() ))[5,4,3];
-   $year = $year + 1900;
-   $month += 1;
-   return sprintf("%04d%02d%02d",$year,$month,$day);
-}
-
 # Write Keys configuration
 sub write_conf {
        
@@ -135,7 +116,7 @@ sub write_conf {
     close(CONF);
   
     print scalar(keys %key_ring) . " keys on key ring\n" if ($verbose);
-}
+} # End sub write_conf()
 
 # Read the QR data and process keys
 sub import_qr {
@@ -197,9 +178,6 @@ sub import_qr {
                 # Decode de Base32 pass
                 my $secret = decode_base32( $secret32);
                
-                # convert the passwords in octal notation
-                $secret =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
-
                 # Assign values to the key ring
                 if ($issuer ne '') {
                     $key_ring{$issuer}{secret}    = $secret;
@@ -225,7 +203,7 @@ sub import_qr {
         else {
             print "Error: No Google Authenticator Export Data found\n";
         }
-    }
+    } # end sub _process_data()
     
     # create work directory if not exists
     unless (-f $work_dir) {
@@ -271,10 +249,18 @@ sub import_qr {
         print "Usage:\n";
         print "    ./ga_cli.pl -import \[image_file(.png|.jpg)\]\n";
     }    
-}
+} # End sub import_qr()
 
 # export Keys to QR for load in Google Authenticator
 sub export_qr {
+   
+    # Date to put on export QR files
+    sub _date {
+        my ($year, $month, $day) = (localtime( time() ))[5,4,3];
+        $year = $year + 1900;
+        $month += 1;
+        return sprintf("%04d%02d%02d",$year,$month,$day);
+    } # End sub _date()
    
     # Obtain keys to process
     my $total_keys = scalar(keys %key_ring);
@@ -331,7 +317,7 @@ sub export_qr {
                         darkcolor     => Imager::Color->new(0, 0, 0),
                 );
                 my $img = $qrcode->plot( GAHEADER . "$mime_data");
-                my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.jpg", date(), $current, $images_count);
+                my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.jpg", _date(), $current, $images_count);
                 $img->write(file => "$qr_file");
                 
                 # Show progress
@@ -351,7 +337,43 @@ sub export_qr {
     else {
         print "Error: No keys to process\n";
     }
-}
+} # End sub export_qr()
+
+sub otp {
+
+    # Show Green or Red Text if the timer change
+    sub _semaphore {
+        my ($seconds) = (localtime( time() ))[0];
+        my $aux = $seconds % 30;
+        my $color = FG_RED;
+        if ($aux <= 25) {
+           $color = FG_GREEN;
+        }
+        return $color;
+    } # End sub _semaphore()
+   
+    # Generate OTP
+    foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
+        my $auth = Auth::GoogleAuth->new({
+               secret => "$key_ring{$issuer}{secret}",
+               issuer => "$issuer",
+               key_id => "$key_ring{$issuer}{key_id}",
+           });
+        $auth->secret32( encode_base32( $auth->secret() ) );
+        my $out = sprintf( "%30s " . _semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
+        
+        # Filter output 
+        if ($ARGV[0] ne '' ) {
+            if ($issuer =~ /$ARGV[0]/i) {
+               print $out;
+            }
+        }
+        else {
+            print $out;
+        }
+        $auth->clear();
+    }
+} # End sub otp()
 
 #-----------#
 # Main body #
@@ -369,28 +391,8 @@ elsif ($export) {
 }
 # if have valid keys, process
 elsif ( scalar(keys %key_ring) > 0 ) {
-
     # Generate OTP
-    foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
-        my $auth = Auth::GoogleAuth->new({
-               secret => "$key_ring{$issuer}{secret}",
-               issuer => "$issuer",
-               key_id => "$key_ring{$issuer}{key_id}",
-           });
-        $auth->secret32( encode_base32( $auth->secret() ) );
-        my $out = sprintf( "%30s " . semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
-        
-        # Filter output 
-        if ($ARGV[0] ne '' ) {
-            if ($issuer =~ /$ARGV[0]/i) {
-               print $out;
-            }
-        }
-        else {
-            print $out;
-        }
-        $auth->clear();
-    }
+    otp();
 }
 else {
     print "Error: No keys found\n";
