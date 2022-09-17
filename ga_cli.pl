@@ -44,6 +44,7 @@ GetOptions(\%options,
            'import=s@{1,}',
            'export',
            'add=s%{3}',
+           'remove=s%{1}',
            'clear',
            'verbose',
            'help|?',
@@ -360,6 +361,24 @@ sub add_key {
     }
 } # End add_key()
 
+sub remove_key {
+    if ( $options{'remove'}{'issuer'} ) {
+        
+        # if exists a match remove the account from key ring
+        if ( exists($key_ring{$options{'remove'}{'issuer'}}) ) {
+            delete $key_ring{"$options{'remove'}{'issuer'}"};
+            write_conf()
+        }
+        else {
+            print "Error: no issuer match to remove\n";            
+        }
+    }
+    else {
+        print "Usage:\n";
+        print '    ./ga_cli.pl -remove issuer=\'Some Company\'' . "\n";
+    }
+} # End remove_key()
+
 # Generate the OTP from the accounts on the key ring
 sub otp {
 
@@ -419,6 +438,9 @@ elsif ($options{'export'}) {
 elsif ($options{'add'}) {
     add_key();
 }
+elsif ($options{'remove'}) {
+    remove_key();
+}
 # if have valid keys, process
 elsif ( scalar(keys %key_ring) > 0 ) {
     # Generate OTP
@@ -470,6 +492,14 @@ ga_cli.pl -export
 Add a single account to key ring manually:
 
 ga_cli.pl -add issuer='your issuer' keyid='me@something.com' secret='A random pass'
+
+=item B<-remove or -r>
+
+Remove a single account from the key ring manually:
+
+ga_cli.pl -remove issuer='your issuer'
+
+The issuer name must have a exact match to procced (Case sensitive)
 
 =item B<-clear or -c>
 

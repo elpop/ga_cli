@@ -9,7 +9,7 @@ Program to take the accounts of the Authenticator App, via one snapshot of the E
 ## Summary
 
 ```
-ga_cli.pl -h
+./ga_cli.pl -h
 
 Usage:
     ga_cli.pl [options] {file ...}
@@ -39,6 +39,13 @@ Options:
 
             ga_cli.pl -add issuer='your issuer' keyid='me@something.com'
             secret='A random pass'
+
+    -remove or -r
+            Remove a single account from the key ring manually:
+
+            ga_cli.pl -remove issuer='your issuer'
+
+            The issuer name must have a exact match to procced (Case sensitive)
 
     -clear or -c
             Delete the key ring, works with -import, -add or -export
@@ -218,8 +225,16 @@ Options:
    ```
    ga_cli.pl -add issuer='your issuer' keyid='me@something.com' secret='A random pass'
    ```
+
+6. remove a key manually
+
+   ```
+   ga_cli.pl -remove issuer='your issuer'
+   ```
    
-6. The two_factor.pl program
+   The issuer name must have a exact match to procced (Case sensitive).
+    
+7. The two_factor.pl program
 
     Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
