@@ -9,7 +9,7 @@ Program to take the accounts of the Authenticator App, via one snapshot of the E
 ## Summary
 
 ```
-./ga_cli.pl -h
+ga_cli.pl -h
 
 Usage:
     ga_cli.pl [options] {file ...}
@@ -35,13 +35,16 @@ Options:
             ga_cli.pl -export
 
     -add or -a
+            Add a single account to key ring manually:
+
             ga_cli.pl -add issuer='your issuer' keyid='me@something.com'
             secret='A random pass'
 
     -clear or -c
-            Delete the key ring, works with -import or -export options. When
-            use -import or -add, Init the key ring and set new values. With
-            -export, generate the QR images and delete the key ring.
+            Delete the key ring, works with -import, -add or -export
+            options. When use -import or -add, Init the key ring and set new
+            values. With -export, generate the QR images and delete the key
+            ring.
 
     -verbose or -v
             Show progress when using -import or -export options

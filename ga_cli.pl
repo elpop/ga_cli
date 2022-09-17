@@ -466,11 +466,13 @@ ga_cli.pl -export
 
 =item B<-add or -a>
 
+Add a single account to key ring manually:
+
 ga_cli.pl -add issuer='your issuer' keyid='me@something.com' secret='A random pass'
 
 =item B<-clear or -c>
 
-Delete the key ring, works with -import or -export options.
+Delete the key ring, works with -import, -add or -export options.
 When use -import or -add, Init the key ring and set new values.
 With -export, generate the QR images and delete the key ring.
 
