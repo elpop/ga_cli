@@ -335,6 +335,7 @@ sub export_qr {
     }
 } # End sub export_qr()
 
+# Add manually a single account to the Key Ring
 sub add_key {
     if ( $options{'add'}{'issuer'}
         && $options{'add'}{'keyid'}
@@ -357,7 +358,7 @@ sub add_key {
         print "Usage:\n";
         print '    ./ga_cli.pl -add issuer=\'Some Company\' keyid=\'a@mail\' secret=\'A Passphrase\'' . "\n";
     }
-}
+} # End add_key()
 
 # Generate the OTP from the accounts on the key ring
 sub otp {
