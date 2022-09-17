@@ -9,6 +9,8 @@ Program to take the accounts of the Authenticator App, via one snapshot of the E
 ## Summary
 
 ```
+./ga_cli.pl -h
+
 Usage:
     ga_cli.pl [options] {file ...}
 
@@ -32,10 +34,14 @@ Options:
 
             ga_cli.pl -export
 
+    -add or -a
+            ga_cli.pl -add issuer='your issuer' keyid='me@something.com'
+            secret='A random pass'
+
     -clear or -c
             Delete the key ring, works with -import or -export options. When
-            use -import, Init the key ring an load new values. With -export,
-            generate the QR images and delete the key ring.
+            use -import or -add, Init the key ring and set new values. With
+            -export, generate the QR images and delete the key ring.
 
     -verbose or -v
             Show progress when using -import or -export options
@@ -204,7 +210,13 @@ Options:
     export_keys_20220908_03_of_03.jpg
     ```
 
-5. The two_factor.pl program
+5. Add a key manually
+
+   ```
+   ga_cli.pl -add issuer='your issuer' keyid='me@something.com' secret='A random pass'
+   ```
+   
+6. The two_factor.pl program
 
     Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
@@ -248,10 +260,6 @@ Options:
     When use the "-qr" option, you see a QR image like the following to add account into the Google Authenticator App:
     
     ![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
-
-## To-Do
-
-    -add option to add a key with manual parameters to the key ring (no via QR).
 
 ## Author
 

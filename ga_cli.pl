@@ -43,6 +43,7 @@ my %options = ();
 GetOptions(\%options,
            'import=s@{1,}',
            'export',
+           'add=s%{3}',
            'clear',
            'verbose',
            'help|?',
@@ -334,6 +335,30 @@ sub export_qr {
     }
 } # End sub export_qr()
 
+sub add_key {
+    if ( $options{'add'}{'issuer'}
+        && $options{'add'}{'keyid'}
+        && $options{'add'}{'secret'}) {
+
+        # Clean key_ring
+        %key_ring = () if ($options{'clear'});
+
+        # Add to key ring
+        $key_ring{$options{'add'}{'issuer'}}{secret}    = $options{'add'}{'secret'};
+        $key_ring{$options{'add'}{'issuer'}}{keyid}     = $options{'add'}{'keyid'};
+        $key_ring{$options{'add'}{'issuer'}}{algorithm} = 1;
+        $key_ring{$options{'add'}{'issuer'}}{digits}    = 1;
+        $key_ring{$options{'add'}{'issuer'}}{type}      = 2;
+        print "$options{'add'}{'issuer'} key added\n" if ($options{'verbose'});
+        
+        write_conf();
+    }
+    else {
+        print "Usage:\n";
+        print '    ./ga_cli.pl -add issuer=\'Some Company\' keyid=\'a@mail\' secret=\'A Passphrase\'' . "\n";
+    }
+}
+
 # Generate the OTP from the accounts on the key ring
 sub otp {
 
@@ -390,6 +415,9 @@ elsif ($options{'import'}) {
 elsif ($options{'export'}) {
     export_qr();
 }
+elsif ($options{'add'}) {
+    add_key();
+}
 # if have valid keys, process
 elsif ( scalar(keys %key_ring) > 0 ) {
     # Generate OTP
@@ -436,10 +464,14 @@ Create QR images for export to Googla Authenticator App:
 
 ga_cli.pl -export
 
+=item B<-add or -a>
+
+ga_cli.pl -add issuer='your issuer' keyid='me@something.com' secret='A random pass'
+
 =item B<-clear or -c>
 
 Delete the key ring, works with -import or -export options.
-When use -import, Init the key ring an load new values.
+When use -import or -add, Init the key ring and set new values.
 With -export, generate the QR images and delete the key ring.
 
 =item B<-verbose or -v>
