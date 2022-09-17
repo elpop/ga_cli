@@ -232,7 +232,7 @@ Options:
    ga_cli.pl -remove issuer='your issuer'
    ```
    
-   The issuer name must have a exact match to procced (Case sensitive).
+   The issuer name must have a exact match to proceed (Case sensitive).
     
 7. The two_factor.pl program
 
