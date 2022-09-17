@@ -45,7 +45,7 @@ Options:
 
             ga_cli.pl -remove issuer='your issuer'
 
-            The issuer name must have a exact match to procced (Case sensitive)
+            The issuer name must have a exact match to proceed (Case sensitive)
 
     -clear or -c
             Delete the key ring, works with -import, -add or -export

@@ -499,7 +499,7 @@ Remove a single account from the key ring manually:
 
 ga_cli.pl -remove issuer='your issuer'
 
-The issuer name must have a exact match to procced (Case sensitive)
+The issuer name must have a exact match to proceed (Case sensitive)
 
 =item B<-clear or -c>
 
