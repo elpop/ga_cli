@@ -157,7 +157,7 @@ Options:
     You can process multiple images when Google Authenticator make more than one QR:
 
     ```   
-    ./qr_to_ga_cli.pl -v -i qr_one.jpg qr_two.jpg ...
+    ./ga_cli.pl -v -i qr_one.jpg qr_two.jpg ...
     ```
     
     This program generate a file called "keys" on the path "$HOME/.ga_cli", is a perl hash definition with the information of your accounts.
