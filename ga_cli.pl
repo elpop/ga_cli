@@ -249,7 +249,7 @@ sub import_qr {
     }    
 } # End sub import_qr()
 
-# export Keys to QR for load in Google Authenticator
+# export all Keys to QR for load in Google Authenticator
 sub export_qr {
    
     # Date to put on export QR files
@@ -362,6 +362,7 @@ sub add_key {
     }
 } # End add_key()
 
+# Remove a single key from key ring
 sub remove_key {
     if ( $options{'remove'}{'issuer'} ) {
         
@@ -380,6 +381,7 @@ sub remove_key {
     }
 } # End remove_key()
 
+# Generate a QR image from a given issuer
 sub qr_issuer {
     if ( $options{'qr'}{'issuer'} ) {
         
