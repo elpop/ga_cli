@@ -45,6 +45,7 @@ GetOptions(\%options,
            'export',
            'add=s%{3}',
            'remove=s%{1}',
+           'qr=s%{1}',
            'clear',
            'verbose',
            'help|?',
@@ -314,7 +315,7 @@ sub export_qr {
                         darkcolor     => Imager::Color->new(0, 0, 0),
                 );
                 my $img = $qrcode->plot( GAHEADER . "$mime_data");
-                my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.jpg", _date(), $current, $images_count);
+                my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.png", _date(), $current, $images_count);
                 $img->write(file => "$qr_file");
                 
                 # Show progress
@@ -379,6 +380,40 @@ sub remove_key {
     }
 } # End remove_key()
 
+sub qr_issuer {
+    if ( $options{'qr'}{'issuer'} ) {
+        
+        # if exists a match, generate the QR image from the key ring
+        if ( exists($key_ring{$options{'qr'}{'issuer'}}) ) {
+            
+            my $qrcode = Imager::QRCode->new(
+                   size          => 4,
+                   margin        => 1,
+                   version       => 1,
+                   level         => 'M',
+                   casesensitive => 1,
+                   lightcolor    => Imager::Color->new(255, 255, 255),
+                   darkcolor     => Imager::Color->new(0, 0, 0),
+               );
+            my $leyend = 'otpauth://totp/'. $options{'qr'}{'issuer'} . ':' . $key_ring{$options{'qr'}{'issuer'}}{keyid} . 
+                         '?secret=' . encode_base32($key_ring{$options{'qr'}{'issuer'}}{secret}) .'&issuer=' . $options{'qr'}{'issuer'};
+            $leyend =~ s/\s/\%20/g;
+            my $img = $qrcode->plot("$leyend");
+            $options{'qr'}{'issuer'} =~ s/\s/\_/g;
+            $img->write(file => "qr_$options{'qr'}{'issuer'}.png");
+            
+            print "qr_$options{'qr'}{'issuer'}.png\n" if ($options{'verbose'});
+        }
+        else {
+            print "Error: no issuer match\n";
+        }
+    }
+    else {
+        print "Usage:\n";
+        print '    ./ga_cli.pl -qr issuer=\'Some Company\'' . "\n";
+    }
+} # End qr_issuer()
+
 # Generate the OTP from the accounts on the key ring
 sub otp {
 
@@ -441,6 +476,9 @@ elsif ($options{'add'}) {
 elsif ($options{'remove'}) {
     remove_key();
 }
+elsif ($options{'qr'}) {
+    qr_issuer();
+}
 # if have valid keys, process
 elsif ( scalar(keys %key_ring) > 0 ) {
     # Generate OTP
@@ -472,7 +510,21 @@ Show the TOTP of each account.
 ga_cli.pl
 
     OpenEnchilada  972144
+
+=item B<Word>    
+
+If you pass a value without '-', only shows the ones than contain your criteria (case insensitive):
     
+ga_cli.pl bit
+
+           BITMAIN  067333
+            BitMEX  376455
+             Bitso  215278
+        
+This is equivalent to:
+
+./ga_cli.pl | grep -i bit
+
 =item B<-import or -i>
 
 Import given QR image file:
@@ -481,11 +533,27 @@ ga_cli.pl -import export_accounts_sample.jpg
 
 The QR image can be the full Google Authenticator Export Set or a single account for add to the key ring
 
+You can process multiple images when Google Authenticator make more than one QR:
+
+ga_cli.pl -v -i qr_one.jpg qr_two.jpg ...
+
+JPG and PNG formats are supported.
+
 =item B<-export or -e>
 
 Create QR images for export to Googla Authenticator App:
 
 ga_cli.pl -export
+
+The program take all the keys on the key ring and create a set of files
+(depending of the keys quantity) named "export_keys_YYYYMMDD_XX_of_ZZ.png".
+where YYYYMMDD is the date, XX is the sequence and ZZ the total images on the set.
+
+Each QR contain 10 keys per image. For example, if you have 25 keys, we generate 3 QR files:
+    
+    export_keys_20220908_01_of_03.png
+    export_keys_20220908_02_of_03.png
+    export_keys_20220908_03_of_03.png
 
 =item B<-add or -a>
 
@@ -501,6 +569,15 @@ ga_cli.pl -remove issuer='your issuer'
 
 The issuer name must have a exact match to proceed (Case sensitive)
 
+=item B<-qr or -q>
+
+Create a QR image for a single account to add to your authenticator app:
+
+ga_cli.pl -qr issuer='your issuer'
+
+The issuer name must have a exact match to proceed (Case sensitive).
+The image file is named qr_{issuer}.png
+
 =item B<-clear or -c>
 
 Delete the key ring, works with -import, -add or -export options.
@@ -509,7 +586,7 @@ With -export, generate the QR images and delete the key ring.
 
 =item B<-verbose or -v>
 
-Show progress when using -import or -export options
+Show progress when using -import, -export, -add, -remove and -qr options
 
 =item B<-help or -h or -?>
 
