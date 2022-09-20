@@ -177,8 +177,8 @@ Options:
     ```
     cp ga_cli.pl /usr/local/bin/.
     ```
-    
-##The two_factor.pl program
+
+## The two_factor.pl program
 
     Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
