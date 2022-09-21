@@ -261,6 +261,7 @@ sub export_qr {
         return sprintf("%04d%02d%02d",$year,$month,$day);
     } # End sub _date()
 
+    # if exists a list of issuers, create individual QR images
     if ( @{$options{'export'}}[0] ne '' ) {
         
         foreach my $issuer (@{$options{'export'}}) {
@@ -291,6 +292,7 @@ sub export_qr {
             }
         }
     }
+    # Create full QR backup to import into Google Authenticator
     else {
         # Obtain keys to process
         my $total_keys = scalar(keys %key_ring);
