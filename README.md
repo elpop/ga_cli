@@ -66,6 +66,18 @@ Options:
                 export_keys_20220908_02_of_03.png
                 export_keys_20220908_03_of_03.png
 
+            Create a QR image for a single account to add to your
+            authenticator app:
+
+            ga_cli.pl -e 'your issuer'
+
+            The issuer name must have a exact match to proceed (Case
+            sensitive). The image file is named qr_{issuer}.png
+
+            Could use a list of issuers:
+
+            ga_cli.pl -e 'Binance.com' 'Bitso' ...
+
     -add or -a
             Add a single account to key ring manually:
 
@@ -79,15 +91,6 @@ Options:
 
             The issuer name must have a exact match to proceed (Case
             sensitive)
-
-    -qr or -q
-            Create a QR image for a single account to add to your
-            authenticator app:
-
-            ga_cli.pl -qr issuer='your issuer'
-
-            The issuer name must have a exact match to proceed (Case
-            sensitive). The image file is named qr_{issuer}.png
 
     -clear or -c
             Delete the key ring, works with -import, -add or -export

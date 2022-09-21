@@ -40,9 +40,10 @@ my %key_ring = ();
 my %options = ();
 
 # Command Line options
+
 GetOptions(\%options,
            'import=s@{1,}',
-           'export',
+           'export:s@{,}',
            'add=s%{3}',
            'remove=s%{1}',
            'qr=s%{1}',
@@ -259,81 +260,113 @@ sub export_qr {
         $month += 1;
         return sprintf("%04d%02d%02d",$year,$month,$day);
     } # End sub _date()
-   
-    # Obtain keys to process
-    my $total_keys = scalar(keys %key_ring);
-    my $images_count = int($total_keys / 10);
-    my %export_ring = ( 'version' => 1,
-                        'QRCount' => 1,
-                        'QRIndex' => 0, );
-    my $key_counter = 0;
-    my $current = 1;
 
-    if ( ($total_keys % 10) > 0) {
-        $images_count++;
-    }
-    $export_ring{QRCount} = $images_count;
-    
-    # If have keys to process
-    if ($total_keys > 0) {
-    
-        # Load Protocol Buffer Array to process
-        foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
-            $key_counter++;
-            push @{$export_ring{'Index'}},
-                 ({
-                  'issuer'    => "$issuer",
-                  'keyid'     => "$key_ring{$issuer}{keyid}",
-                  'pass'      => "$key_ring{$issuer}{secret}",
-                  'algorithm' => $key_ring{$issuer}{algorithm},
-                  'digits'    => $key_ring{$issuer}{digits},
-                  'type'      => $key_ring{$issuer}{type},
-                 });
+    if ( @{$options{'export'}}[0] ne '' ) {
         
-            # Generate QR each 10 keys    
-            if ( ( ($key_counter % 10) == 0 )
-                || ($key_counter == $total_keys) ) {
+        foreach my $issuer (@{$options{'export'}}) {
+
+            # if exists a match, generate the QR image from the key ring
+            if ( exists($key_ring{$issuer}) ) {
                 
-                # Process Protocol Buffers from de MIME Base64 Data
-                my $protocol_buffer = GA->encode(\%export_ring);
-        
-                # Encode MIME Base64                
-                my $mime_data = encode_base64($protocol_buffer);
-                
-                # URL Encode
-                $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-                $mime_data =~ s/\%0A//g; # avoid new line
-                
-                # generate QR image
                 my $qrcode = Imager::QRCode->new(
-                        size          => 4,
-                        margin        => 1,
-                        version       => 1,
-                        level         => 'M',
-                        casesensitive => 1,
-                        lightcolor    => Imager::Color->new(255, 255, 255),
-                        darkcolor     => Imager::Color->new(0, 0, 0),
-                );
-                my $img = $qrcode->plot( GAHEADER . "$mime_data");
-                my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.png", _date(), $current, $images_count);
-                $img->write(file => "$qr_file");
+                       size          => 4,
+                       margin        => 1,
+                       version       => 1,
+                       level         => 'M',
+                       casesensitive => 1,
+                       lightcolor    => Imager::Color->new(255, 255, 255),
+                       darkcolor     => Imager::Color->new(0, 0, 0),
+                   );
+                my $leyend = 'otpauth://totp/'. $issuer . ':' . $key_ring{$issuer}{keyid} . 
+                             '?secret=' . encode_base32($key_ring{$issuer}{secret}) .'&issuer=' . $issuer;
+                $leyend =~ s/\s/\%20/g;
+                my $img = $qrcode->plot("$leyend");
+                $issuer =~ s/\s/\_/g;
+                $img->write(file => "qr_$issuer.png");
                 
-                # Show progress
-                print "$qr_file\n" if ($options{'verbose'});
-                
-                # Clean Up the has for the next 10 keys
-                $export_ring{'Index'} = ();
-                $export_ring{QRIndex} = $current++; # Next batch number
+                print "qr_$issuer.png\n" if ($options{'verbose'});
             }
-        }
-        # Clean key_ring
-        if ($options{'clear'}) {
-            %key_ring = ();
-            write_conf();
+            else {
+                print "Error: no issuer match\n";
+            }
         }
     }
     else {
-        print "Error: No keys to process\n";
+        # Obtain keys to process
+        my $total_keys = scalar(keys %key_ring);
+        my $images_count = int($total_keys / 10);
+        my %export_ring = ( 'version' => 1,
+                            'QRCount' => 1,
+                            'QRIndex' => 0, );
+        my $key_counter = 0;
+        my $current = 1;
+    
+        if ( ($total_keys % 10) > 0) {
+            $images_count++;
+        }
+        $export_ring{QRCount} = $images_count;
+        
+        # If have keys to process
+        if ($total_keys > 0) {
+        
+            # Load Protocol Buffer Array to process
+            foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
+                $key_counter++;
+                push @{$export_ring{'Index'}},
+                     ({
+                      'issuer'    => "$issuer",
+                      'keyid'     => "$key_ring{$issuer}{keyid}",
+                      'pass'      => "$key_ring{$issuer}{secret}",
+                      'algorithm' => $key_ring{$issuer}{algorithm},
+                      'digits'    => $key_ring{$issuer}{digits},
+                      'type'      => $key_ring{$issuer}{type},
+                     });
+            
+                # Generate QR each 10 keys    
+                if ( ( ($key_counter % 10) == 0 )
+                    || ($key_counter == $total_keys) ) {
+                    
+                    # Process Protocol Buffers from de MIME Base64 Data
+                    my $protocol_buffer = GA->encode(\%export_ring);
+            
+                    # Encode MIME Base64                
+                    my $mime_data = encode_base64($protocol_buffer);
+                    
+                    # URL Encode
+                    $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
+                    $mime_data =~ s/\%0A//g; # avoid new line
+                    
+                    # generate QR image
+                    my $qrcode = Imager::QRCode->new(
+                            size          => 4,
+                            margin        => 1,
+                            version       => 1,
+                            level         => 'M',
+                            casesensitive => 1,
+                            lightcolor    => Imager::Color->new(255, 255, 255),
+                            darkcolor     => Imager::Color->new(0, 0, 0),
+                    );
+                    my $img = $qrcode->plot( GAHEADER . "$mime_data");
+                    my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.png", _date(), $current, $images_count);
+                    $img->write(file => "$qr_file");
+                    
+                    # Show progress
+                    print "$qr_file\n" if ($options{'verbose'});
+                    
+                    # Clean Up the has for the next 10 keys
+                    $export_ring{'Index'} = ();
+                    $export_ring{QRIndex} = $current++; # Next batch number
+                }
+            }
+            # Clean key_ring
+            if ($options{'clear'}) {
+                %key_ring = ();
+                write_conf();
+            }
+        }
+        else {
+            print "Error: No keys to process\n";
+        }
     }
 } # End sub export_qr()
 
@@ -380,41 +413,6 @@ sub remove_key {
         print '    ./ga_cli.pl -remove issuer=\'Some Company\'' . "\n";
     }
 } # End remove_key()
-
-# Generate a QR image from a given issuer
-sub qr_issuer {
-    if ( $options{'qr'}{'issuer'} ) {
-        
-        # if exists a match, generate the QR image from the key ring
-        if ( exists($key_ring{$options{'qr'}{'issuer'}}) ) {
-            
-            my $qrcode = Imager::QRCode->new(
-                   size          => 4,
-                   margin        => 1,
-                   version       => 1,
-                   level         => 'M',
-                   casesensitive => 1,
-                   lightcolor    => Imager::Color->new(255, 255, 255),
-                   darkcolor     => Imager::Color->new(0, 0, 0),
-               );
-            my $leyend = 'otpauth://totp/'. $options{'qr'}{'issuer'} . ':' . $key_ring{$options{'qr'}{'issuer'}}{keyid} . 
-                         '?secret=' . encode_base32($key_ring{$options{'qr'}{'issuer'}}{secret}) .'&issuer=' . $options{'qr'}{'issuer'};
-            $leyend =~ s/\s/\%20/g;
-            my $img = $qrcode->plot("$leyend");
-            $options{'qr'}{'issuer'} =~ s/\s/\_/g;
-            $img->write(file => "qr_$options{'qr'}{'issuer'}.png");
-            
-            print "qr_$options{'qr'}{'issuer'}.png\n" if ($options{'verbose'});
-        }
-        else {
-            print "Error: no issuer match\n";
-        }
-    }
-    else {
-        print "Usage:\n";
-        print '    ./ga_cli.pl -qr issuer=\'Some Company\'' . "\n";
-    }
-} # End qr_issuer()
 
 # Generate the OTP from the accounts on the key ring
 sub otp {
@@ -477,9 +475,6 @@ elsif ($options{'add'}) {
 }
 elsif ($options{'remove'}) {
     remove_key();
-}
-elsif ($options{'qr'}) {
-    qr_issuer();
 }
 # if have valid keys, process
 elsif ( scalar(keys %key_ring) > 0 ) {
@@ -557,6 +552,16 @@ Each QR contain 10 keys per image. For example, if you have 25 keys, we generate
     export_keys_20220908_02_of_03.png
     export_keys_20220908_03_of_03.png
 
+Create a QR image for a single account to add to your authenticator app:
+
+ga_cli.pl -e 'your issuer' 
+
+The issuer name must have a exact match to proceed (Case sensitive). The image file is named qr_{issuer}.png
+
+Could use a list of issuers:
+
+ga_cli.pl -e 'Binance.com' 'Bitso' ... 
+
 =item B<-add or -a>
 
 Add a single account to key ring manually:
@@ -570,15 +575,6 @@ Remove a single account from the key ring manually:
 ga_cli.pl -remove issuer='your issuer'
 
 The issuer name must have a exact match to proceed (Case sensitive)
-
-=item B<-qr or -q>
-
-Create a QR image for a single account to add to your authenticator app:
-
-ga_cli.pl -qr issuer='your issuer'
-
-The issuer name must have a exact match to proceed (Case sensitive).
-The image file is named qr_{issuer}.png
 
 =item B<-clear or -c>
 
