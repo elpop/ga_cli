@@ -27,11 +27,12 @@ use Pod::Usage;
 # Constants 
 use constant {
     # Header for QR messages on export
-    GAHEADER => 'otpauth-migration://offline?data=',
+    HEADERGA   => 'otpauth-migration://offline',
+    HEADERTOTP => 'otpauth://totp/',
     # Text Colors
-    FG_GREEN => "\033[32m",
-    FG_RED   => "\033[31m",
-    RESET    => "\033[0m",
+    FG_GREEN   => "\033[32m",
+    FG_RED     => "\033[31m",
+    RESET      => "\033[0m",
 };
 
 # Work variables
@@ -130,7 +131,7 @@ sub import_qr {
         my $qr_data_ref = shift;
       
         # Check for "otpauth-migration://offline" in the QR info
-        if ($$qr_data_ref =~ /^otpauth-migration:\/\/offline/) {
+        if ($$qr_data_ref =~ /^${\HEADERGA}/) {
           
             # only take the MIME Data on the QR message
             my ($data) = $$qr_data_ref =~/data=(.*)/;
@@ -166,7 +167,7 @@ sub import_qr {
             }
         }
         # Check for "otpauth://totp/" in the QR info for add a single key
-        elsif ($$qr_data_ref =~ /^otpauth:\/\/totp/) {
+        elsif ($$qr_data_ref =~ /^${\HEADERTOTP}/) {
 
             # Obtain values
             my ($keyid, $secret32, $issuer) = $$qr_data_ref =~ /totp\/.*?\:(.*)\?secret\=(.*)\&issuer=(.*)/;
@@ -278,7 +279,7 @@ sub export_qr {
                        lightcolor    => Imager::Color->new(255, 255, 255),
                        darkcolor     => Imager::Color->new(0, 0, 0),
                    );
-                my $leyend = 'otpauth://totp/'. $issuer . ':' . $key_ring{$issuer}{keyid} . 
+                my $leyend = HEADERTOTP . $issuer . ':' . $key_ring{$issuer}{keyid} . 
                              '?secret=' . encode_base32($key_ring{$issuer}{secret}) .'&issuer=' . $issuer;
                 $leyend =~ s/\s/\%20/g;
                 my $img = $qrcode->plot("$leyend");
@@ -348,7 +349,7 @@ sub export_qr {
                             lightcolor    => Imager::Color->new(255, 255, 255),
                             darkcolor     => Imager::Color->new(0, 0, 0),
                     );
-                    my $img = $qrcode->plot( GAHEADER . "$mime_data");
+                    my $img = $qrcode->plot( HEADERGA . "\?data=$mime_data");
                     my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.png", _date(), $current, $images_count);
                     $img->write(file => "$qr_file");
                     
