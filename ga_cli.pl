@@ -41,7 +41,6 @@ my %key_ring = ();
 my %options = ();
 
 # Command Line options
-
 GetOptions(\%options,
            'import=s@{1,}',
            'export:s@{,}',
@@ -120,10 +119,12 @@ sub write_conf {
     close(CONF);
   
     print scalar(keys %key_ring) . " keys on key ring\n" if ($options{'verbose'});
+    
 } # End sub write_conf()
 
 # Read the QR data and process keys
 sub import_qr {
+    
     my $qr_data = '';
     my @images = grep {/\.(jpg|jpeg|png)$/} @{$options{'import'}}; # filter image files from command arguments
     
@@ -240,7 +241,8 @@ sub import_qr {
                 _process_data(\$qr_data);
             }
             undef($image);
-        }        
+        }
+        
         write_conf();
     }
     # If you don't give any file, print help
@@ -252,7 +254,7 @@ sub import_qr {
 
 # export all Keys to QR for load in Google Authenticator
 sub export_qr {
-   
+    
     # Date to put on export QR files
     sub _date {
         my ($year, $month, $day) = (localtime( time() ))[5,4,3];
@@ -294,6 +296,7 @@ sub export_qr {
     }
     # Create full QR backup to import into Google Authenticator
     else {
+        
         # Obtain keys to process
         my $total_keys = scalar(keys %key_ring);
         my $images_count = int($total_keys / 10);
@@ -355,11 +358,12 @@ sub export_qr {
                     # Show progress
                     print "$qr_file\n" if ($options{'verbose'});
                     
-                    # Clean Up the has for the next 10 keys
+                    # Clean Up the hash for the next 10 keys
                     $export_ring{'Index'} = ();
                     $export_ring{QRIndex} = $current++; # Next batch number
                 }
             }
+            
             # Clean key_ring
             if ($options{'clear'}) {
                 %key_ring = ();
@@ -374,6 +378,8 @@ sub export_qr {
 
 # Add manually a single account to the Key Ring
 sub add_key {
+    
+    # if have values, proceed
     if ( $options{'add'}{'issuer'}
         && $options{'add'}{'keyid'}
         && $options{'add'}{'secret'}) {
@@ -399,11 +405,14 @@ sub add_key {
 
 # Remove a single key from key ring
 sub remove_key {
+    
+    # if has a value proceed
     if ( $options{'remove'}{'issuer'} ) {
-        
         # if exists a match remove the account from key ring
         if ( exists($key_ring{$options{'remove'}{'issuer'}}) ) {
+    
             delete $key_ring{"$options{'remove'}{'issuer'}"};
+    
             write_conf()
         }
         else {
@@ -418,7 +427,7 @@ sub remove_key {
 
 # Generate the OTP from the accounts on the key ring
 sub otp {
-
+    
     # Show Green or Red Text if the timer change
     sub _semaphore {
         my ($seconds) = (localtime( time() ))[0];
@@ -429,7 +438,7 @@ sub otp {
         }
         return $color;
     } # End sub _semaphore()
-   
+    
     # Generate OTP
     foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
         my $auth = Auth::GoogleAuth->new({
@@ -439,7 +448,7 @@ sub otp {
            });
         $auth->secret32( encode_base32( $auth->secret() ) );
         my $out = sprintf( "%30s " . _semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
-        
+
         # Filter output 
         if ($ARGV[0] ne '' ) {
             if ($issuer =~ /$ARGV[0]/i) {
@@ -449,6 +458,7 @@ sub otp {
         else {
             print $out;
         }
+
         $auth->clear();
     }
 } # End sub otp()
@@ -584,6 +594,8 @@ The issuer name must have a exact match to proceed (Case sensitive)
 Delete the key ring, works with -import, -add or -export options.
 When use -import or -add, Init the key ring and set new values.
 With -export, generate the QR images and delete the key ring.
+
+Use with caution, you can lose all you keys.
 
 =item B<-verbose or -v>
 
