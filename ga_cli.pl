@@ -13,16 +13,16 @@
 #                     (c) 2022 - Fernando Romo                        #
 #=====================================================================#
 use strict;
-use Auth::GoogleAuth;
-use Barcode::ZBar;
-use Convert::Base32;
-use File::Copy;
-use Getopt::Long;
-use Google::ProtocolBuffers;
-use Image::Magick;
-use Imager::QRCode;
-use MIME::Base64;
-use Pod::Usage;
+use Auth::GoogleAuth;        # Handle Google Authenticator account info
+use Barcode::ZBar;           # Read QR code
+use Convert::Base32;         # Base32 encoding/decoding
+use File::Copy;              # file cp or mv
+use Getopt::Long;            # Handle the arguments passed to the program
+use Google::ProtocolBuffers; # Google Protocol buffers compiler
+use Image::Magick;           # Handle image info
+use Imager::QRCode;          # Generate QR images
+use MIME::Base64;            # MIME Encoding/Decoding
+use Pod::Usage;              # Perl documentation for help
 
 # Constants 
 use constant {
@@ -89,7 +89,9 @@ Google::ProtocolBuffers->parse("
      {create_accessors => 1}
 );
 
-# Write Keys configuration
+#--------------------------#
+# Write Keys configuration #
+#--------------------------#
 sub write_conf {
 
     # create work directory if not exists
@@ -123,7 +125,9 @@ sub write_conf {
     
 } # End sub write_conf()
 
-# Read the QR data and process keys
+#-----------------------------------#
+# Read the QR data and process keys #
+#-----------------------------------#
 sub import_qr {
     
     my $qr_data = '';
@@ -253,9 +257,11 @@ sub import_qr {
     }    
 } # End sub import_qr()
 
-# export all Keys to QR for load in Google Authenticator
+#--------------------------------------------------------#
+# export all Keys to QR for load in Google Authenticator #
+#--------------------------------------------------------#
 sub export_qr {
-    
+
     # Date to put on export QR files
     sub _date {
         my ($year, $month, $day) = (localtime( time() ))[5,4,3];
@@ -377,7 +383,9 @@ sub export_qr {
     }
 } # End sub export_qr()
 
-# Add manually a single account to the Key Ring
+#-----------------------------------------------#
+# Add manually a single account to the Key Ring #
+#-----------------------------------------------#
 sub add_key {
     
     # if have values, proceed
@@ -404,7 +412,9 @@ sub add_key {
     }
 } # End add_key()
 
-# Remove a single key from key ring
+#-----------------------------------#
+# Remove a single key from key ring #
+#-----------------------------------#
 sub remove_key {
     
     # if has a value proceed
@@ -426,7 +436,9 @@ sub remove_key {
     }
 } # End remove_key()
 
-# Generate the OTP from the accounts on the key ring
+#----------------------------------------------------#
+# Generate the OTP from the accounts on the key ring #
+#----------------------------------------------------#
 sub otp {
     
     # Show Green or Red Text if the timer change
@@ -506,13 +518,20 @@ elsif ( scalar(keys %key_ring) > 0 ) {
 else {
     print "Error: No keys found\n";
 }
+# End Main Body #
 
-# Help info for use with Pod::Usage
+#-----------------------------------#
+# Help info for use with Pod::Usage #
+#-----------------------------------#
 __END__
 
 =head1 NAME
 
 ga_cli.pl
+
+=head1 DESCRIPTION
+
+This program is a CLI version of the Google Authenticator App.   
 
 =head1 SYNOPSIS
 
@@ -533,13 +552,13 @@ ga_cli.pl
 =item B<Word>    
 
 If you pass a value without '-', only shows the ones than contain your criteria (case insensitive):
-    
+
 ga_cli.pl bit
 
            BITMAIN  067333
             BitMEX  376455
              Bitso  215278
-        
+
 This is equivalent to:
 
 ga_cli.pl | grep -i bit
@@ -579,7 +598,7 @@ The program take all the keys on the key ring and create a set of files
 where YYYYMMDD is the date, XX is the sequence and ZZ the total images on the set.
 
 Each QR contain 10 keys per image. For example, if you have 25 keys, we generate 3 QR files:
-    
+
     export_keys_20220908_01_of_03.png
     export_keys_20220908_02_of_03.png
     export_keys_20220908_03_of_03.png
@@ -625,9 +644,5 @@ Show progress when using -import, -export, -add, and -remove options
 Show this help
 
 =back 
-
-=head1 DESCRIPTION
-
-B<ga_cli.pl> This program is a CLI version of the Google Authenticator App.   
 
 =cut
