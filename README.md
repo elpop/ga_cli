@@ -99,7 +99,7 @@ Options:
             ring.
 
     -verbose or -v
-            Show progress when using -import, -export, -add, -remove and -qr
+            Show progress when using -import, -export, -add, and -remove
             options
 
     -help or -h or -?
@@ -183,11 +183,11 @@ Options:
 
 ## The two_factor.pl program
 
-    Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
+Is a tool to generate OTP, validate it and extract general info of a given account. Also can make a QR image to add a new account into the Authenticator App.
     
-    The options are:
+The options are:
     
-    ```
+```
     ./two_factor.pl 
     Usage:
       
@@ -208,23 +208,24 @@ Options:
           4) print One Time Password like the Google Authenticator app:
       
              ./two_factor.pl -code
-    ```
-    You can configure your account data in the body of the program:
+```
+
+You can configure your account data in the body of the program:
     
-    ```
+```
     # Define credentials used by Auth::GoogleAuth  
     my $auth = Auth::GoogleAuth->new({
            secret => 'Another silly passphrase',
            issuer => 'OpenEnchilada',
            key_id => '@El_Pop',
        });
-    ```
+```
     
-    Only change the secret, issuer and key_id according your preferences.
+Only change the secret, issuer and key_id according your preferences.
     
-    When use the "-qr" option, you see a QR image like the following to add account into the Google Authenticator App:
+When use the "-qr" option, you see a QR image like the following to add account into the Google Authenticator App:
     
-    ![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
+![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
 
 ## Author
 

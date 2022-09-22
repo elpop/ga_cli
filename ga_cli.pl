@@ -586,7 +586,7 @@ With -export, generate the QR images and delete the key ring.
 
 =item B<-verbose or -v>
 
-Show progress when using -import, -export, -add, -remove and -qr options
+Show progress when using -import, -export, -add, and -remove options
 
 =item B<-help or -h or -?>
 
