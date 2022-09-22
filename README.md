@@ -32,7 +32,16 @@ Options:
 
             This is equivalent to:
 
-            ./ga_cli.pl | grep -i bit
+            ga_cli.pl | grep -i bit
+
+    -list or -l
+            The -list or -l option only show the issuer name
+
+            ga_cli.pl -l
+
+            This is equivalent to:
+
+            ga_cli.pl | awk '{print $1}'
 
     -import or -i
             Import given QR image file:
@@ -97,7 +106,7 @@ Options:
             options. When use -import or -add, Init the key ring and set new
             values. With -export, generate the QR images and delete the key
             ring.
-            
+
             Use with caution, you can lose all you keys.
 
     -verbose or -v

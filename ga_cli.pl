@@ -47,6 +47,7 @@ GetOptions(\%options,
            'add=s%{3}',
            'remove=s%{1}',
            'clear',
+           'list',
            'verbose',
            'help|?',
 );
@@ -447,8 +448,16 @@ sub otp {
                key_id => "$key_ring{$issuer}{key_id}",
            });
         $auth->secret32( encode_base32( $auth->secret() ) );
-        my $out = sprintf( "%30s " . _semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
-
+        
+        my $out = '';
+        # Only show issuer name if -list or -l option used
+        if ($options{'list'}) {
+           $out = "$issuer\n";    
+        }
+        else {
+            $out = sprintf( "%30s " . _semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
+        }
+        
         # Filter output 
         if ($ARGV[0] ne '' ) {
             if ($issuer =~ /$ARGV[0]/i) {
@@ -533,7 +542,17 @@ ga_cli.pl bit
         
 This is equivalent to:
 
-./ga_cli.pl | grep -i bit
+ga_cli.pl | grep -i bit
+
+=item B<-list or -l>
+
+The -list or -l option only show the issuer name
+
+ga_cli.pl -l
+
+This is equivalent to:
+
+ga_cli.pl | awk '{print $1}'
 
 =item B<-import or -i>
 
