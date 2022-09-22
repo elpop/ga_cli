@@ -92,6 +92,11 @@ Google::ProtocolBuffers->parse("
 
 # Write Keys configuration
 sub write_conf {
+
+    # create work directory if not exists
+    unless (-f $work_dir) {
+        mkdir($work_dir);
+    }
        
     # make a backup (just in case).
     if (-f "$work_dir\/keys") {
@@ -204,12 +209,7 @@ sub import_qr {
             print "Error: No Google Authenticator Export Data found\n";
         }
     } # end sub _process_data()
-    
-    # create work directory if not exists
-    unless (-f $work_dir) {
-        mkdir($work_dir);
-    }
-    
+        
     # Process if exists the argument with a image filename 
     if ($#images >=0) {
         
