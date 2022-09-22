@@ -47,7 +47,6 @@ GetOptions(\%options,
            'export:s@{,}',
            'add=s%{3}',
            'remove=s%{1}',
-           'qr=s%{1}',
            'clear',
            'verbose',
            'help|?',
@@ -463,6 +462,7 @@ if (-f "$work_dir\/keys") {
     %key_ring = do "$work_dir\/keys";
 }
 
+# Process options
 if ($options{'help'}) {
     pod2usage(-exitval => 0, -verbose => 1);
     pod2usage(2);
