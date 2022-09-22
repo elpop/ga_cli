@@ -97,6 +97,8 @@ Options:
             options. When use -import or -add, Init the key ring and set new
             values. With -export, generate the QR images and delete the key
             ring.
+            
+            Use with caution, you can lose all you keys.
 
     -verbose or -v
             Show progress when using -import, -export, -add, and -remove
