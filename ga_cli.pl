@@ -545,15 +545,15 @@ ga_cli.pl [options] {file ...}
 
 Show the TOTP of each account.
 
-ga_cli.pl
+    ga_cli.pl
 
-    OpenEnchilada  972144
+        OpenEnchilada  972144
 
 =item B<Word>    
 
 If you pass a value without '-', only shows the ones than contain your criteria (case insensitive):
 
-ga_cli.pl bit
+    ga_cli.pl bit
 
            BITMAIN  067333
             BitMEX  376455
@@ -561,29 +561,39 @@ ga_cli.pl bit
 
 This is equivalent to:
 
-ga_cli.pl | grep -i bit
+    ga_cli.pl | grep -i bit
+    
+The following chars could be used on searchs:
 
+    '^' something starting with.
+    '$' something ending with.
+    '.*' wildcard character.
+    
+    ga_cli.pl "^p.*m$"
+    
+        pool.bitcoin.com  095968
+        
 =item B<-list or -l>
 
 The -list or -l option only show the issuer name
 
-ga_cli.pl -l
+    ga_cli.pl -l
 
 This is equivalent to:
 
-ga_cli.pl | awk '{print $1}'
+    ga_cli.pl | awk '{print $1}'
 
 =item B<-import or -i>
 
 Import given QR image file:
 
-ga_cli.pl -import export_accounts_sample.jpg
+    ga_cli.pl -import export_accounts_sample.jpg
 
 The QR image can be the full Google Authenticator Export Set or a single account for add to the key ring
 
 You can process multiple images when Google Authenticator make more than one QR:
 
-ga_cli.pl -v -i qr_one.jpg qr_two.jpg ...
+    ga_cli.pl -v -i qr_one.jpg qr_two.jpg ...
 
 JPG and PNG formats are supported.
 
@@ -591,7 +601,7 @@ JPG and PNG formats are supported.
 
 Create QR images for export to Googla Authenticator App:
 
-ga_cli.pl -export
+    ga_cli.pl -export
 
 The program take all the keys on the key ring and create a set of files
 (depending of the keys quantity) named "export_keys_YYYYMMDD_XX_of_ZZ.png".
@@ -605,25 +615,35 @@ Each QR contain 10 keys per image. For example, if you have 25 keys, we generate
 
 Create a QR image for a single account to add to your authenticator app:
 
-ga_cli.pl -e 'your issuer' 
+    ga_cli.pl -e 'your issuer' 
 
 The issuer name must have a exact match to proceed (Case sensitive). The image file is named qr_{issuer}.png
 
 Could use a list of issuers:
 
-ga_cli.pl -e 'Binance.com' 'Bitso' ... 
+    ga_cli.pl -e 'Binance.com' 'Bitso' ...
+
+You can export all your keys in individual files with a simple bash script:
+
+    #!/bin/bash
+    issuers=""
+    for i in `ga_cli.pl -l`
+    do
+       issuers+=" $i" 
+    done
+    ga_cli.pl -v -e $issuers
 
 =item B<-add or -a>
 
 Add a single account to key ring manually:
 
-ga_cli.pl -add issuer='your issuer' keyid='me@something.com' secret='A random pass'
+    ga_cli.pl -add issuer='your issuer' keyid='me@something.com' secret='A random pass'
 
 =item B<-remove or -r>
 
 Remove a single account from the key ring manually:
 
-ga_cli.pl -remove issuer='your issuer'
+    ga_cli.pl -remove issuer='your issuer'
 
 The issuer name must have a exact match to proceed (Case sensitive)
 
