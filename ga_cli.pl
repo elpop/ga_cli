@@ -137,7 +137,7 @@ sub import_qr {
     %key_ring = () if ($options{'clear'});
     
     #Internal function to process Data 
-    local *_process_data = sub {
+    sub _process_data {
         my $qr_data_ref = shift;
       
         # Check for "otpauth-migration://offline" in the QR info
@@ -263,7 +263,7 @@ sub import_qr {
 sub export_qr {
 
     # Date to put on export QR files
-    local *_date = sub {
+    sub _date {
         my ($year, $month, $day) = (localtime( time() ))[5,4,3];
         $year = $year + 1900;
         $month += 1;
@@ -442,7 +442,7 @@ sub remove_key {
 sub otp {
     
     # Show Green or Red Text if the timer change
-    local *_semaphore = sub {
+    sub _semaphore {
         my ($seconds) = (localtime( time() ))[0];
         my $aux = $seconds % 30;
         my $color = FG_RED;
