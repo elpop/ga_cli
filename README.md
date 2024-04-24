@@ -167,7 +167,7 @@ Options:
     Fedora/Red-Hat Linux systems:
     
     ```
-    sudo dnf install libpng libpng-devel libjpeg libjpeg-devel libtiff libtiff-devel ImageMagick zbar-devel protobuf qrencode-libs
+    sudo dnf install libpng libpng-devel libjpeg libjpeg-devel ImageMagick zbar-devel protobuf qrencode-libs
     ```
     
 3. Perl Dependencies
