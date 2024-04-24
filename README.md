@@ -199,7 +199,7 @@ Options:
     Fedora/Red-Hat Linux systems:
     
     ```
-    sudo dnf install cpan perl-Convert-Base32 perl-MIME-Base64 ImageMagick-perl 
+    sudo dnf install cpan perl-Convert-Base32 perl-MIME-Base64 ImageMagick-perl perl-Imager
     sudo cpan install Imager::QRCode Barcode::ZBar Auth::GoogleAuth Google::ProtocolBuffers
     ```
 
