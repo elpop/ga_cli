@@ -167,7 +167,7 @@ Options:
     Fedora/Red-Hat Linux systems:
     
     ```
-    sudo dnf install libpng libpng-devel libjpeg libjpeg-devel libtiff libtiff-devel ImageMagick zbar-devel protobuf qrencode-libs
+    sudo dnf install libpng libpng-devel libjpeg libjpeg-devel ImageMagick zbar-devel protobuf qrencode-libs
     ```
     
 3. Perl Dependencies
@@ -199,7 +199,7 @@ Options:
     Fedora/Red-Hat Linux systems:
     
     ```
-    sudo dnf install perl-Convert-Base32 perl-MIME-Base64 ImageMagick-perl 
+    sudo dnf install cpan perl-Convert-Base32 perl-MIME-Base64 ImageMagick-perl perl-Imager
     sudo cpan install Imager::QRCode Barcode::ZBar Auth::GoogleAuth Google::ProtocolBuffers
     ```
 
