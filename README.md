@@ -141,7 +141,7 @@ Options:
 1. Download file
   
     ```
-    git clone https://github.com/elpop/2fa.git
+    git clone https://github.com/elpop/ga_cli.git
     ```  
 
 2. Install library dependecies:
@@ -255,7 +255,7 @@ Only change the secret, issuer and key_id according your preferences.
     
 When use the "-qr" option, you see a QR image like the following to add account into the Google Authenticator App:
     
-![](https://github.com/elpop/2fa/blob/main/two_factor.jpg?raw=true)
+![](https://github.com/elpop/ga_cli/blob/main/two_factor.jpg?raw=true)
 
 ## Author
 
