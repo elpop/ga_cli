@@ -170,14 +170,6 @@ sub import_qr {
                     $key_ring{$ref->{issuer}}{$ref->{keyid}}{type}      = $ref->{type};
                     print "    $ref->{issuer}:$ref->{keyid}\n" if ($options{'verbose'});
                 }
-#                else {
-#                    $key_ring{$ref->{keyid}}{secret}    = $ref->{pass};
-#                    $key_ring{$ref->{keyid}}{keyid}     = $ref->{keyid};
-#                    $key_ring{$ref->{keyid}}{algorithm} = $ref->{algorithm};
-#                    $key_ring{$ref->{keyid}}{digits}    = $ref->{digits};
-#                    $key_ring{$ref->{keyid}}{type}      = $ref->{type};
-#                    print "    $ref->{keyid}\n" if ($options{'verbose'});
-#                }
             }
         }
         # Check for "otpauth://totp/" in the QR info for add a single key
@@ -204,14 +196,6 @@ sub import_qr {
                     $key_ring{$issuer}{$keyid}{type}      = 2;
                     print "    $issuer:$keyid\n" if ($options{'verbose'});
                 }
-#                else {
-#                    $key_ring{$keyid}{secret}    = $secret;
-#                    $key_ring{$keyid}{keyid}     = $keyid;
-#                    $key_ring{$keyid}{algorithm} = 1;
-#                    $key_ring{$keyid}{digits}    = 1;
-#                    $key_ring{$keyid}{type}      = 2;
-#                    print "    $keyid\n" if ($options{'verbose'});
-#                }
             }
             else {
                 print "Error: No account to add to key ring\n";
@@ -280,10 +264,10 @@ sub export_qr {
     # if exists a list of issuers, create individual QR images
     if ( @{$options{'export'}}[0] ne '' ) {
         
-        foreach my $issuer (@{$options{'export'}}) {
-
+        foreach my $for_export (@{$options{'export'}}) {
+            my ($issuer, $keyid) = split(':',$for_export); 
             # if exists a match, generate the QR image from the key ring
-            if ( exists($key_ring{$issuer}) ) {
+            if ( exists($key_ring{$issuer}{$keyid}) ) {
                 
                 my $qrcode = Imager::QRCode->new(
                        size          => 4,
@@ -294,17 +278,17 @@ sub export_qr {
                        lightcolor    => Imager::Color->new(255, 255, 255),
                        darkcolor     => Imager::Color->new(0, 0, 0),
                    );
-                my $leyend = HEADERTOTP . $issuer . ':' . $key_ring{$issuer}{keyid} . 
-                             '?secret=' . encode_base32($key_ring{$issuer}{secret}) .'&issuer=' . $issuer;
+                my $leyend = HEADERTOTP . $issuer . ':' . $keyid . 
+                             '?secret=' . encode_base32($key_ring{$issuer}{$keyid}{secret}) .'&issuer=' . $issuer;
                 $leyend =~ s/\s/\%20/g;
                 my $img = $qrcode->plot("$leyend");
                 $issuer =~ s/\s/\_/g;
-                $img->write(file => "qr_$issuer.png");
+                $img->write(file => "qr_$issuer" . '_' . "$keyid.png");
                 
-                print "qr_$issuer.png\n" if ($options{'verbose'});
+                print "qr_$issuer" . '_' . "$keyid.png\n" if ($options{'verbose'});
             }
             else {
-                print "Error: no issuer match\n";
+                print "Error: no issuer:keyid match\n";
             }
         }
     }
@@ -632,13 +616,13 @@ Each QR contain 10 keys per image. For example, if you have 25 keys, we generate
 
 Create a QR image for a single account to add to your authenticator app:
 
-    ga_cli.pl -e 'your issuer' 
+    ga_cli.pl -e 'your issuer:your keyid' 
 
 The issuer name must have a exact match to proceed (Case sensitive). The image file is named qr_{issuer}.png
 
 Could use a list of issuers:
 
-    ga_cli.pl -e 'Binance.com' 'Bitso' ...
+    ga_cli.pl -e 'Binance.com:johndoo' 'Bitso:bitso' ...
 
 You can export all your keys in individual files with a simple bash script:
 
@@ -660,7 +644,7 @@ Add a single account to key ring manually:
 
 Remove a single account from the key ring manually:
 
-    ga_cli.pl -remove issuer='your issuer'
+    ga_cli.pl -remove issuer='your issuer' keyid='your keyid'
 
 The issuer name must have a exact match to proceed (Case sensitive)
 
