@@ -618,7 +618,7 @@ Create a QR image for a single account to add to your authenticator app:
 
     ga_cli.pl -e 'your issuer:your keyid' 
 
-The issuer name must have a exact match to proceed (Case sensitive). The image file is named qr_{issuer}.png
+The issuer name must have a exact match to proceed (Case sensitive). The image file is named qr_{issuer}_{keyid}.png
 
 Could use a list of issuers:
 
