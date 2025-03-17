@@ -9,7 +9,7 @@ Program to take the accounts of the Authenticator App, via one snapshot of the E
 ## Summary
 
 ```
- ./ga_cli.pl -h
+$ ./ga_cli.pl -h
 Usage:
     ga_cli.pl [options] {file ...}
 
@@ -87,14 +87,14 @@ Options:
             Create a QR image for a single account to add to your
             authenticator app:
 
-                ga_cli.pl -e 'your issuer'
+                ga_cli.pl -e 'your issuer:your keyid'
 
             The issuer name must have a exact match to proceed (Case
-            sensitive). The image file is named qr_{issuer}.png
+            sensitive). The image file is named qr_{issuer}_{keyid}.png
 
             Could use a list of issuers:
 
-                ga_cli.pl -e 'Binance.com' 'Bitso' ...
+                ga_cli.pl -e 'Binance.com:johndoo' 'Bitso:bitso' ...
 
             You can export all your keys in individual files with a simple
             bash script:
@@ -115,7 +115,7 @@ Options:
     -remove or -r
             Remove a single account from the key ring manually:
 
-                ga_cli.pl -remove issuer='your issuer'
+                ga_cli.pl -remove issuer='your issuer' keyid='your keyid'
 
             The issuer name must have a exact match to proceed (Case
             sensitive)
