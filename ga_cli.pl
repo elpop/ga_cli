@@ -179,6 +179,10 @@ sub import_qr {
         # Check for "otpauth://totp/" in the QR info for add a single key
         elsif ($$qr_data_ref =~ /^${\HEADERTOTP}/) {
 
+            # replace %3A = : and %40 = @
+            $$qr_data_ref =~ s/\%40/\@/g;
+            $$qr_data_ref =~ s/\%3A/\:/g;
+
             # Obtain values
             my ($keyid, $secret32, $issuer) = $$qr_data_ref =~ /totp\/.*?\:(.*)\?secret\=(.*)\&issuer=(.*)/;
 
