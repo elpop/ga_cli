@@ -45,7 +45,7 @@ GetOptions(\%options,
            'import=s@{1,}',
            'export:s@{,}',
            'add=s%{3}',
-           'remove=s%{1}',
+           'remove=s%{2}',
            'clear',
            'list',
            'verbose',
@@ -107,21 +107,26 @@ sub write_conf {
     # Create and write a conf file called "keys"
     open(CONF, ">:encoding(UTF-8)","$work_dir\/keys") or die "Can't create conf file: $!";
     print CONF "(\n";
+    my $count = 0;
     foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
         print CONF "    '$issuer' => {\n";
-        print CONF "        keyid     => '$key_ring{$issuer}{keyid}',\n";
-        # convert the passwords in octal notation
-        $key_ring{$issuer}{secret} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
-        print CONF "        secret    => \"$key_ring{$issuer}{secret}\",\n";
-        print CONF "        algorithm => $key_ring{$issuer}{algorithm},\n";
-        print CONF "        digits    => $key_ring{$issuer}{digits},\n";
-        print CONF "        type      => $key_ring{$issuer}{type},\n";
+        foreach my $keyid (sort { "\U$a" cmp "\U$b" } keys %{$key_ring{$issuer}} ) {
+            $count++;
+            print CONF "        '$keyid' => {\n";
+            # convert the passwords in octal notation
+            $key_ring{$issuer}{$keyid}{secret} =~ s/[\N{U+0000}-\N{U+FFFF}]/sprintf("\\%03o",ord($&))/eg;
+            print CONF "            secret    => \"$key_ring{$issuer}{$keyid}{secret}\",\n";
+            print CONF "            algorithm => $key_ring{$issuer}{$keyid}{algorithm},\n";
+            print CONF "            digits    => $key_ring{$issuer}{$keyid}{digits},\n";
+            print CONF "            type      => $key_ring{$issuer}{$keyid}{type},\n";
+            print CONF "        },\n";
+        }
         print CONF "    },\n";
     }
     print CONF ");\n";
     close(CONF);
   
-    print scalar(keys %key_ring) . " keys on key ring\n" if ($options{'verbose'});
+    print "$count keys on key ring\n" if ($options{'verbose'});
     
 } # End sub write_conf()
 
@@ -159,21 +164,20 @@ sub import_qr {
               
                 # Assign values to the key ring
                 if ($ref->{issuer} ne '') {
-                    $key_ring{$ref->{issuer}}{secret}    = $ref->{pass};
-                    $key_ring{$ref->{issuer}}{keyid}     = $ref->{keyid};
-                    $key_ring{$ref->{issuer}}{algorithm} = $ref->{algorithm};
-                    $key_ring{$ref->{issuer}}{digits}    = $ref->{digits};
-                    $key_ring{$ref->{issuer}}{type}      = $ref->{type};
-                    print "    $ref->{issuer}\n" if ($options{'verbose'});
+                    $key_ring{$ref->{issuer}}{$ref->{keyid}}{secret}    = $ref->{pass};
+                    $key_ring{$ref->{issuer}}{$ref->{keyid}}{algorithm} = $ref->{algorithm};
+                    $key_ring{$ref->{issuer}}{$ref->{keyid}}{digits}    = $ref->{digits};
+                    $key_ring{$ref->{issuer}}{$ref->{keyid}}{type}      = $ref->{type};
+                    print "    $ref->{issuer}:$ref->{keyid}\n" if ($options{'verbose'});
                 }
-                else {
-                    $key_ring{$ref->{keyid}}{secret}    = $ref->{pass};
-                    $key_ring{$ref->{keyid}}{keyid}     = $ref->{keyid};
-                    $key_ring{$ref->{keyid}}{algorithm} = $ref->{algorithm};
-                    $key_ring{$ref->{keyid}}{digits}    = $ref->{digits};
-                    $key_ring{$ref->{keyid}}{type}      = $ref->{type};
-                    print "    $ref->{keyid}\n" if ($options{'verbose'});
-                }
+#                else {
+#                    $key_ring{$ref->{keyid}}{secret}    = $ref->{pass};
+#                    $key_ring{$ref->{keyid}}{keyid}     = $ref->{keyid};
+#                    $key_ring{$ref->{keyid}}{algorithm} = $ref->{algorithm};
+#                    $key_ring{$ref->{keyid}}{digits}    = $ref->{digits};
+#                    $key_ring{$ref->{keyid}}{type}      = $ref->{type};
+#                    print "    $ref->{keyid}\n" if ($options{'verbose'});
+#                }
             }
         }
         # Check for "otpauth://totp/" in the QR info for add a single key
@@ -194,21 +198,20 @@ sub import_qr {
                
                 # Assign values to the key ring
                 if ($issuer ne '') {
-                    $key_ring{$issuer}{secret}    = $secret;
-                    $key_ring{$issuer}{keyid}     = $keyid;
-                    $key_ring{$issuer}{algorithm} = 1;
-                    $key_ring{$issuer}{digits}    = 1;
-                    $key_ring{$issuer}{type}      = 2;
-                    print "    $issuer\n" if ($options{'verbose'});
+                    $key_ring{$issuer}{$keyid}{secret}    = $secret;
+                    $key_ring{$issuer}{$keyid}{algorithm} = 1;
+                    $key_ring{$issuer}{$keyid}{digits}    = 1;
+                    $key_ring{$issuer}{$keyid}{type}      = 2;
+                    print "    $issuer:$keyid\n" if ($options{'verbose'});
                 }
-                else {
-                    $key_ring{$keyid}{secret}    = $secret;
-                    $key_ring{$keyid}{keyid}     = $keyid;
-                    $key_ring{$keyid}{algorithm} = 1;
-                    $key_ring{$keyid}{digits}    = 1;
-                    $key_ring{$keyid}{type}      = 2;
-                    print "    $keyid\n" if ($options{'verbose'});
-                }
+#                else {
+#                    $key_ring{$keyid}{secret}    = $secret;
+#                    $key_ring{$keyid}{keyid}     = $keyid;
+#                    $key_ring{$keyid}{algorithm} = 1;
+#                    $key_ring{$keyid}{digits}    = 1;
+#                    $key_ring{$keyid}{type}      = 2;
+#                    print "    $keyid\n" if ($options{'verbose'});
+#                }
             }
             else {
                 print "Error: No account to add to key ring\n";
@@ -309,8 +312,15 @@ sub export_qr {
     else {
         
         # Obtain keys to process
-        my $total_keys = scalar(keys %key_ring);
+        my $total_keys = 0;
+        foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
+            foreach my $keyid (sort { "\U$a" cmp "\U$b" } keys %{$key_ring{$issuer}} ) {
+                    $total_keys++;
+            }
+        }
+
         my $images_count = int($total_keys / 10);
+
         my %export_ring = ( 'version' => 1,
                             'QRCount' => 1,
                             'QRIndex' => 0, );
@@ -327,54 +337,56 @@ sub export_qr {
         
             # Load Protocol Buffer Array to process
             foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
-                $key_counter++;
-                push @{$export_ring{'Index'}},
-                     ({
-                      'issuer'    => "$issuer",
-                      'keyid'     => "$key_ring{$issuer}{keyid}",
-                      'pass'      => "$key_ring{$issuer}{secret}",
-                      'algorithm' => $key_ring{$issuer}{algorithm},
-                      'digits'    => $key_ring{$issuer}{digits},
-                      'type'      => $key_ring{$issuer}{type},
-                     });
+                foreach my $keyid (sort { "\U$a" cmp "\U$b" } keys %{$key_ring{$issuer}} ) {
+                    $key_counter++;
+                    push @{$export_ring{'Index'}},
+                        ({
+                           'issuer'    => "$issuer",
+                           'keyid'     => "$keyid",
+                           'pass'      => "$key_ring{$issuer}{$keyid}{secret}",
+                           'algorithm' => $key_ring{$issuer}{$keyid}{algorithm},
+                           'digits'    => $key_ring{$issuer}{$keyid}{digits},
+                           'type'      => $key_ring{$issuer}{$keyid}{type},
+                          });
             
-                # Generate QR each 10 keys    
-                if ( ( ($key_counter % 10) == 0 )
-                    || ($key_counter == $total_keys) ) {
+                    # Generate QR each 10 keys    
+                    if ( ( ($key_counter % 10) == 0 )
+                        || ($key_counter == $total_keys) ) {
                     
-                    # Process Protocol Buffers from de MIME Base64 Data
-                    my $protocol_buffer = GA->encode(\%export_ring);
+                        # Process Protocol Buffers from de MIME Base64 Data
+                        my $protocol_buffer = GA->encode(\%export_ring);
             
-                    # Encode MIME Base64                
-                    my $mime_data = encode_base64($protocol_buffer);
+                        # Encode MIME Base64                
+                        my $mime_data = encode_base64($protocol_buffer);
                     
-                    # URL Encode
-                    $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
-                    $mime_data =~ s/\%0A//g; # avoid new line
+                        # URL Encode
+                        $mime_data =~ s/([^A-Za-z0-9])/sprintf("%%%02X", ord($1))/seg;
+                        $mime_data =~ s/\%0A//g; # avoid new line
                     
-                    # generate QR image
-                    my $qrcode = Imager::QRCode->new(
-                            size          => 4,
-                            margin        => 1,
-                            version       => 1,
-                            level         => 'M',
-                            casesensitive => 1,
-                            lightcolor    => Imager::Color->new(255, 255, 255),
-                            darkcolor     => Imager::Color->new(0, 0, 0),
-                    );
-                    my $img = $qrcode->plot( HEADERGA . "\?data=$mime_data");
-                    my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.png", _date(), $current, $images_count);
-                    $img->write(file => "$qr_file");
+                        # generate QR image
+                        my $qrcode = Imager::QRCode->new(
+                                size          => 4,
+                                margin        => 1,
+                                version       => 1,
+                                level         => 'M',
+                                casesensitive => 1,
+                                lightcolor    => Imager::Color->new(255, 255, 255),
+                                darkcolor     => Imager::Color->new(0, 0, 0),
+                        );
+                        my $img = $qrcode->plot( HEADERGA . "\?data=$mime_data");
+                        my $qr_file = sprintf("export_keys_%08d_%02d_of_%02d.png", _date(), $current, $images_count);
+                        $img->write(file => "$qr_file");
                     
-                    # Show progress
-                    print "$qr_file\n" if ($options{'verbose'});
+                        # Show progress
+                        print "$qr_file\n" if ($options{'verbose'});
                     
-                    # Clean Up the hash for the next 10 keys
-                    $export_ring{'Index'} = ();
-                    $export_ring{QRIndex} = $current++; # Next batch number
+                        # Clean Up the hash for the next 10 keys
+                        $export_ring{'Index'} = ();
+                        $export_ring{QRIndex} = $current++; # Next batch number
+                    }
                 }
             }
-            
+ 
             # Clean key_ring
             if ($options{'clear'}) {
                 %key_ring = ();
@@ -401,12 +413,11 @@ sub add_key {
         %key_ring = () if ($options{'clear'});
 
         # Add to key ring
-        $key_ring{$options{'add'}{'issuer'}}{secret}    = $options{'add'}{'secret'};
-        $key_ring{$options{'add'}{'issuer'}}{keyid}     = $options{'add'}{'keyid'};
-        $key_ring{$options{'add'}{'issuer'}}{algorithm} = 1;
-        $key_ring{$options{'add'}{'issuer'}}{digits}    = 1;
-        $key_ring{$options{'add'}{'issuer'}}{type}      = 2;
-        print "$options{'add'}{'issuer'} key added\n" if ($options{'verbose'});
+        $key_ring{$options{'add'}{'issuer'}}{$options{'add'}{'keyid'}}{secret}    = $options{'add'}{'secret'};
+        $key_ring{$options{'add'}{'issuer'}}{$options{'add'}{'keyid'}}{algorithm} = 1;
+        $key_ring{$options{'add'}{'issuer'}}{$options{'add'}{'keyid'}}{digits}    = 1;
+        $key_ring{$options{'add'}{'issuer'}}{$options{'add'}{'keyid'}}{type}      = 2;
+        print "$options{'add'}{'issuer'}:$options{'add'}{'keyid'} key added\n" if ($options{'verbose'});
         
         write_conf();
     }
@@ -422,11 +433,11 @@ sub add_key {
 sub remove_key {
     
     # if has a value proceed
-    if ( $options{'remove'}{'issuer'} ) {
+    if ( $options{'remove'}{'issuer'} &&  $options{'remove'}{'keyid'}) {
         # if exists a match remove the account from key ring
-        if ( exists($key_ring{$options{'remove'}{'issuer'}}) ) {
+        if ( exists($key_ring{$options{'remove'}{'issuer'}}{$options{'remove'}{'keyid'}}) ) {
     
-            delete $key_ring{"$options{'remove'}{'issuer'}"};
+            delete $key_ring{"$options{'remove'}{'issuer'}"}{"$options{'remove'}{'keyid'}"};
     
             write_conf()
         }
@@ -458,33 +469,35 @@ sub otp {
     
     # Generate OTP
     foreach my $issuer (sort { "\U$a" cmp "\U$b" } keys %key_ring) {
-        my $auth = Auth::GoogleAuth->new({
-               secret => "$key_ring{$issuer}{secret}",
-               issuer => "$issuer",
-               key_id => "$key_ring{$issuer}{key_id}",
-           });
-        $auth->secret32( encode_base32( $auth->secret() ) );
+        foreach my $keyid (sort { "\U$a" cmp "\U$b" } keys %{$key_ring{$issuer}} ) {
+            my $auth = Auth::GoogleAuth->new({
+                   secret => "$key_ring{$issuer}{$keyid}{secret}",
+                   issuer => "$issuer",
+                   key_id => "$keyid",
+            });
+            $auth->secret32( encode_base32( $auth->secret() ) );
         
-        my $out = '';
-        # Only show issuer name if -list or -l option used
-        if ($options{'list'}) {
-           $out = "$issuer\n";    
-        }
-        else {
-            $out = sprintf( "%30s " . _semaphore() . " %06d" . RESET ."\n", $issuer, $auth->code() );
-        }
-        
-        # Filter output 
-        if ($ARGV[0] ne '' ) {
-            if ($issuer =~ /$ARGV[0]/i) {
-               print $out;
+            my $out = '';
+            # Only show issuer name if -list or -l option used
+            if ($options{'list'}) {
+               $out = "$issuer:$keyid\n";    
             }
-        }
-        else {
-            print $out;
-        }
+            else {
+                $out = sprintf('' . _semaphore() . " %06d" . RESET ." %-25s %-25s\n", $auth->code(), $issuer, $keyid );
+            }
+        
+            # Filter output 
+            if ($ARGV[0] ne '' ) {
+                if ($issuer =~ /$ARGV[0]/i) {
+                   print $out;
+                }
+            }
+            else {
+                print $out;
+            }
 
-        $auth->clear();
+            $auth->clear();
+        }
     }
 } # End sub otp()
 
